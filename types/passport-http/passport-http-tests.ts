@@ -8,7 +8,7 @@ import express = require("express");
 
 interface UserInterface {
     username: string;
-    password?: string;
+    password?: string | undefined;
 }
 
 class User {
@@ -25,115 +25,134 @@ function validateNonce(nonce: string) {
 function validateParams(nonce: string, cnonce: string, nc: number, opaque: string) {
 }
 
-passport.use(new http.BasicStrategy((username, password, done) => {
-    User.findOne({
-        username,
-        password,
-    }, (error, user) => {
-        if (error) {
-            done(error);
-            return;
-        }
+new http.BasicStrategy({ passReqToCallback: false }, (username, password, done) => {});
+new http.BasicStrategy({ passReqToCallback: true }, (req, username, password, done) => {});
 
-        if (!user) {
-            done(null, false);
-            return;
-        }
+passport.use(
+    new http.BasicStrategy((username, password, done) => {
+        User.findOne({
+            username,
+            password,
+        }, (error, user) => {
+            if (error) {
+                done(error);
+                return;
+            }
 
-        done(null, user);
-    });
-}));
+            if (!user) {
+                done(null, false);
+                return;
+            }
 
-passport.use(new http.BasicStrategy({
-    realm: "User",
-    passReqToCallback: true,
-}, (req: express.Request, username: string, password: string, done: (error: any, user?: any) => void) => {
-    // with req when needed
-}));
+            done(null, user);
+        });
+    }),
+);
 
-passport.use(new http.BasicStrategy({
-    realm: "User",
-}, (username, password, done) => {
-    // without req by default
-}));
+passport.use(
+    new http.BasicStrategy({
+        realm: "User",
+        passReqToCallback: true,
+    }, (req: express.Request, username: string, password: string, done: (error: any, user?: any) => void) => {
+        // with req when needed
+    }),
+);
 
-passport.use(new http.BasicStrategy({
-    realm: "User",
-    passReqToCallback: false,
-}, (username, password, done) => {
-    // without req
-}));
+passport.use(
+    new http.BasicStrategy({
+        realm: "User",
+    }, (username, password, done) => {
+        // without req by default
+    }),
+);
 
-passport.use(new http.DigestStrategy((username: string, done: any) => {
-    User.findOne({ username }, (error, user) => {
-        if (error) {
-            return done(error);
-        }
+passport.use(
+    new http.BasicStrategy({
+        realm: "User",
+        passReqToCallback: false,
+    }, (username, password, done) => {
+        // without req
+    }),
+);
 
-        if (!user) {
-            return done(null, false);
-        }
+passport.use(
+    new http.DigestStrategy((username: string, done: any) => {
+        User.findOne({ username }, (error, user) => {
+            if (error) {
+                return done(error);
+            }
 
-        done(null, user, user.password);
-    });
-}));
+            if (!user) {
+                return done(null, false);
+            }
 
-passport.use(new http.DigestStrategy((username: string, done: any) => {
-    User.findOne({ username }, (error, user) => {
-        if (error) {
-            return done(error);
-        }
+            done(null, user, user.password);
+        });
+    }),
+);
 
-        if (!user) {
-            return done(null, false);
-        }
+passport.use(
+    new http.DigestStrategy((username: string, done: any) => {
+        User.findOne({ username }, (error, user) => {
+            if (error) {
+                return done(error);
+            }
 
-        done(null, user, user.password);
-    });
-}, (params: http.DigestValidateOptions, done: any) => {
-    validateParams(params.nonce, params.cnonce, params.nc, params.opaque);
-    done(null, true);
-}));
+            if (!user) {
+                return done(null, false);
+            }
 
-passport.use(new http.DigestStrategy({
-    realm: "User",
-    domain: "example.com",
-    opaque: "OpAqUeStRiNg",
-    algorithm: "MD5",
-    qop: "auth",
-}, (username: string, done: any) => {
-    User.findOne({ username }, (error, user) => {
-        if (error) {
-            return done(error);
-        }
+            done(null, user, user.password);
+        });
+    }, (params: http.DigestValidateOptions, done: any) => {
+        validateParams(params.nonce, params.cnonce, params.nc, params.opaque);
+        done(null, true);
+    }),
+);
 
-        if (!user) {
-            return done(null, false);
-        }
+passport.use(
+    new http.DigestStrategy({
+        realm: "User",
+        domain: "example.com",
+        opaque: "OpAqUeStRiNg",
+        algorithm: "MD5",
+        qop: "auth",
+    }, (username: string, done: any) => {
+        User.findOne({ username }, (error, user) => {
+            if (error) {
+                return done(error);
+            }
 
-        done(null, user, user.password);
-    });
-}));
+            if (!user) {
+                return done(null, false);
+            }
 
-passport.use(new http.DigestStrategy({
-    realm: "User",
-    domain: "example.com",
-    opaque: "OpAqUeStRiNg",
-    algorithm: "MD5",
-    qop: "auth",
-}, (username: string, done: any) => {
-    User.findOne({ username }, (error, user) => {
-        if (error) {
-            return done(error);
-        }
+            done(null, user, user.password);
+        });
+    }),
+);
 
-        if (!user) {
-            return done(null, false);
-        }
+passport.use(
+    new http.DigestStrategy({
+        realm: "User",
+        domain: "example.com",
+        opaque: "OpAqUeStRiNg",
+        algorithm: "MD5",
+        qop: "auth",
+    }, (username: string, done: any) => {
+        User.findOne({ username }, (error, user) => {
+            if (error) {
+                return done(error);
+            }
 
-        done(null, user, user.password);
-    });
-}, (params: http.DigestValidateOptions, done: any) => {
-    validateParams(params.nonce, params.cnonce, params.nc, params.opaque);
-    done(null, true);
-}));
+            if (!user) {
+                return done(null, false);
+            }
+
+            done(null, user, user.password);
+        });
+    }, (params: http.DigestValidateOptions, done: any) => {
+        validateParams(params.nonce, params.cnonce, params.nc, params.opaque);
+        done(null, true);
+    }),
+);

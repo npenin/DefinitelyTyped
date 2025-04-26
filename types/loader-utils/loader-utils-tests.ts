@@ -1,16 +1,16 @@
-import { loader } from "webpack";
 import {
+    getCurrentRequest,
+    getHashDigest,
     getOptions,
+    getRemainingRequest,
+    interpolateName,
+    isUrlRequest,
     parseQuery,
+    parseString,
     stringifyRequest,
     urlToRequest,
-    interpolateName,
-    getHashDigest,
-    getRemainingRequest,
-    getCurrentRequest,
-    isUrlRequest,
-    parseString,
 } from "loader-utils";
+import { loader } from "webpack";
 
 parseQuery("?{data:{a:1},isJSON5:true}");
 parseString(`"123"`); // "123"
@@ -22,6 +22,11 @@ jsonStr === parsed; // true
 
 function loader(this: loader.LoaderContext) {
     getOptions(this);
+
+    // get options readonly
+    const options = getOptions(this);
+    // @ts-expect-error
+    options.prop = {};
 
     getRemainingRequest(this);
 
@@ -62,7 +67,7 @@ isUrlRequest("/path/to/module.js", "./root");
 isUrlRequest("/path/to/module.js", "~");
 
 function loader2(this: loader.LoaderContext) {
-// loaderContext.resourcePath = "/app/js/javascript.js"
+    // loaderContext.resourcePath = "/app/js/javascript.js"
     interpolateName(this, "js/[hash].script.[ext]", { content: "" });
     // => js/9473fdd0d880a43c21b7778d34872157.script.js
 

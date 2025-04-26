@@ -1,31 +1,26 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import Switch, { Props } from 'rc-switch';
+import Switch, { Props } from "rc-switch";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 
 /**
- * Only required props.
+ * Only required props (none)
  */
-React.createElement(Switch, {
-    checkedChildren: 'hello',
-    disabled: false,
-    onChange: console.log,
-    unCheckedChildren: 'world'
-});
+React.createElement(Switch);
 
 /**
- * All accepted props.
+ * All accepted props
  */
 React.createElement(Switch, {
     autoFocus: false,
     checked: false,
-    checkedChildren: 'hello',
-    className: 'switch',
+    checkedChildren: "hello",
+    className: "switch",
     defaultChecked: false,
     disabled: false,
     loadingIcon: 0,
     onChange: console.log,
     onClick: console.log,
-    prefixCls: 'rc-',
+    prefixCls: "rc-",
     tabIndex: 0,
-    unCheckedChildren: 'world',
+    unCheckedChildren: "world",
 });

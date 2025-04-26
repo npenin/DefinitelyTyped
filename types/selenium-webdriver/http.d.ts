@@ -1,4 +1,4 @@
-import * as webdriver from './index';
+import * as webdriver from "./index";
 
 /**
  * Converts a headers map to a HTTP header block string.
@@ -21,11 +21,6 @@ export class Request {
      */
     constructor(method: string, path: string, opt_data?: Object);
 
-    headers: Map<string, string>;
-    method: string;
-    path: string;
-    data: Object;
-
     /** @override */
     toString(): string;
 }
@@ -42,10 +37,6 @@ export class Response {
      * @param {string} body The response body.
      */
     constructor(status: number, headers: Object, body: string);
-
-    status: number;
-    body: string;
-    headers: Map<string, string>;
 
     /** @override */
     toString(): string;
@@ -71,14 +62,14 @@ export class HttpClient {
 
     /**
      * Sends a request to the server. The client will automatically follow any
-     * redirects returned by the server, fulfilling the returned promise with the
-     * final response.
+     * redirects returned by the server, fulfilling the returned promise with
+     * the final response.
      *
      * @param {!HttpRequest} httpRequest The request to send.
-     * @return {!promise.Promise<HttpResponse>} A promise that will be fulfilled
+     * @return {!Promise<HttpResponse>} A promise that will be fulfilled
      *     with the server's response.
      */
-    send(httpRequest: Request): webdriver.promise.Promise<Response>;
+    send(httpRequest: Request): Promise<Response>;
 }
 
 /**
@@ -90,7 +81,13 @@ export class HttpClient {
  * @param {?string=} opt_data The data to send with the request.
  * @param {?string=} opt_proxy The proxy server to use for the request.
  */
-export function sendRequest(options: Object, onOk: any, onError: any, opt_data?: string, opt_proxy?: string): any;
+export function sendRequest(
+    options: Object,
+    onOk: any,
+    onError: any,
+    opt_data?: string,
+    opt_proxy?: string,
+): any;
 
 /**
  * A command executor that communicates with the server using HTTP + JSON.
@@ -102,8 +99,6 @@ export function sendRequest(options: Object, onOk: any, onError: any, opt_data?:
  *
  * [json]: https://github.com/SeleniumHQ/selenium/wiki/JsonWireProtocol
  * [w3c]: https://w3c.github.io/webdriver/webdriver-spec.html
- *
- * @implements {cmd.Executor}
  */
 export class Executor {
     /**
@@ -111,7 +106,7 @@ export class Executor {
      *     requests to the server, or a promise-like object that will resolve to
      *     to the client.
      */
-    constructor(client: HttpClient | webdriver.promise.IThenable<HttpClient>);
+    constructor(client: HttpClient | Promise<HttpClient>);
 
     /**
      * Defines a new command for use with this executor. When a command is sent,

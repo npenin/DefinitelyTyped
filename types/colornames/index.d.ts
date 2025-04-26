@@ -1,8 +1,3 @@
-// Type definitions for colornames 1.1
-// Project: https://github.com/timoxley/colornames#readme
-// Definitions by: Manuel Thalmann <https://github.com/manuth>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-
 /**
  * Represents a color.
  */
@@ -15,12 +10,12 @@ interface Color {
     /**
      * Gets a value indicating whether the color is a valid `CSS`-color.
      */
-    css?: boolean;
+    css?: boolean | undefined;
 
     /**
      * Gets a value indicating whether the color is a valid `VGA`-color.
      */
-    vga?: boolean;
+    vga?: boolean | undefined;
 
     /**
      * Gets the name of the color.
@@ -53,7 +48,7 @@ interface GlobalResolver {
     /**
      * Gets the color with the specified name.
      */
-    (name: string): Color;
+    (name: string): string | undefined;
 
     /**
      * Provides the functionality to query colors.

@@ -1,5 +1,5 @@
 import { Dispatcher } from "flux";
-import { ReduceStore, Container } from "flux/utils";
+import { Container, ReduceStore } from "flux/utils";
 import * as React from "react";
 
 interface Payload {
@@ -16,9 +16,9 @@ class CounterStore extends ReduceStore<number, any> {
 
     reduce(state: number, action: Payload): number {
         switch (action.type) {
-            case 'increment':
+            case "increment":
                 return state + 1;
-            case 'square':
+            case "square":
                 return state * state;
             default:
                 return state;
@@ -44,14 +44,16 @@ class CounterContainer extends React.Component<Props, State> {
 
     static calculateState(prevState: State, props: Props): State {
         return {
-            counter: Store.getState() - (props.b ? 0 : 1)
+            counter: Store.getState() - (props.b ? 0 : 1),
         };
     }
 
     render() {
-        return <div>
-            {this.state.counter}
-        </div>;
+        return (
+            <div>
+                {this.state.counter}
+            </div>
+        );
     }
 }
 
@@ -65,14 +67,16 @@ const ContainerComponent3 = Container.create<Props, State>(CounterContainer, { w
 <ContainerComponent3 a="string" b={false} />;
 
 // Functional flux container with Store
-const FunctionalContainerComponent = Container.createFunctional<Props, State>(
-    (props) => {
-        return <div>
-            {props.a} {props.b}
-        </div>;
+const FunctionalContainerComponent = Container.createFunctional(
+    (props: State) => {
+        return (
+            <div>
+                {props.counter}
+            </div>
+        );
     },
-    () => [Store],
-    (prevState) => ({ counter: Store.getState() })
+    (props: Props) => [Store],
+    (prevState: State, props: Props) => ({ counter: Store.getState() }),
 );
 
-<FunctionalContainerComponent a="string" b={true} />;
+<FunctionalContainerComponent a="string" b={false} />;

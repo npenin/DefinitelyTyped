@@ -1,9 +1,3 @@
-// Type definitions for jpeg-autorotate 4.0
-// Project: https://github.com/johansatge/jpeg-autorotate#readme
-// Definitions by: Slessi <https://github.com/Slessi>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-// TypeScript Version: 2.4
-
 /// <reference types="node" />
 
 export enum errors {
@@ -19,13 +13,33 @@ export interface CustomError extends Error {
     code: errors;
 }
 
+export interface RotateOptions {
+    quality?: number | undefined;
+}
+
+export interface RotateDimensions {
+    height: number;
+    width: number;
+}
+
 export function rotate(
     path_or_buffer: string | Buffer,
-    options?: { quality?: number },
+    options: RotateOptions,
+): Promise<{
+    buffer: Buffer;
+    orientation: number;
+    dimensions: RotateDimensions;
+    quality: number;
+}>;
+
+export function rotate(
+    path_or_buffer: string | Buffer,
+    options: RotateOptions,
     module_callback?: (
         error: CustomError | null,
-        buffer: Buffer | null,
+        buffer: Buffer,
         orientation: number | null,
-        dimensions: { height: number; width: number } | null,
+        dimensions: RotateDimensions | null,
+        quality: number | null,
     ) => void,
 ): void;

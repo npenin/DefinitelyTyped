@@ -1,21 +1,9 @@
-// Type definitions for koa-router v7.x
-// Project: https://github.com/alexmingoia/koa-router#readme
-// Definitions by: Jerry Chin <https://github.com/hellopao>
-//                 Pavel Ivanov <https://github.com/schfkt>
-//                 JounQin <https://github.com/JounQin>
-//                 Romain Faust <https://github.com/romain-faust>
-//                 Guillaume Mayer <https://github.com/Guillaume-Mayer>
-//                 Andrea Gueugnaut <https://github.com/falinor>
-// Definitions: https://github.com/hellopao/DefinitelyTyped
-// TypeScript Version: 2.3
-
 /* =================== USAGE ===================
 
     import * as Router from "koa-router";
     var router = new Router();
 
  =============================================== */
-
 
 import * as Koa from "koa";
 
@@ -24,30 +12,30 @@ declare namespace Router {
         /**
          * Prefix for all routes.
          */
-        prefix?: string;
+        prefix?: string | undefined;
         /**
          * Methods which should be supported by the router.
          */
-        methods?: string[];
-        routerPath?: string;
+        methods?: string[] | undefined;
+        routerPath?: string | undefined;
         /**
          * Whether or not routing should be case-sensitive.
          */
-        sensitive?: boolean;
+        sensitive?: boolean | undefined;
         /**
          * Whether or not routes should matched strictly.
          *
          * If strict matching is enabled, the trailing slash is taken into
          * account when matching routes.
          */
-        strict?: boolean;
+        strict?: boolean | undefined;
     }
 
     export interface IRouterParamContext<StateT = any, CustomT = {}> {
         /**
          * url params
          */
-        params: any;
+        params: Record<string, string>;
         /**
          * the router instance
          */
@@ -59,39 +47,46 @@ declare namespace Router {
         _matchedRouteName: string | undefined;
     }
 
-    export type RouterContext<StateT = any, CustomT = {}> =
-        Koa.ParameterizedContext<StateT, CustomT & IRouterParamContext<StateT, CustomT>>;
+    export type RouterContext<StateT = any, CustomT = {}> = Koa.ParameterizedContext<
+        StateT,
+        CustomT & IRouterParamContext<StateT, CustomT>
+    >;
 
     // For backward compatibility IRouterContext needs to be an interface
     // But it's deprecated - please use `RouterContext` instead
     export interface IRouterContext extends RouterContext {}
 
-    export type IMiddleware<StateT = any, CustomT = {}> =
-        Koa.Middleware<StateT, CustomT & IRouterParamContext<StateT, CustomT>>
+    export type IMiddleware<StateT = any, CustomT = {}> = Koa.Middleware<
+        StateT,
+        CustomT & IRouterParamContext<StateT, CustomT>
+    >;
 
-    export interface IParamMiddleware {
-        (param: string, ctx: RouterContext, next: () => Promise<any>): any;
+    export interface IParamMiddleware<STateT = any, CustomT = {}> {
+        (param: string, ctx: RouterContext<STateT, CustomT>, next: () => Promise<any>): any;
     }
 
     export interface IRouterAllowedMethodsOptions {
         /**
          * throw error instead of setting status and header
          */
-        throw?: boolean;
+        throw?: boolean | undefined;
         /**
          * throw the returned value in place of the default NotImplemented error
          */
-        notImplemented?: () => any;
+        notImplemented?: (() => any) | undefined;
         /**
          * throw the returned value in place of the default MethodNotAllowed error
          */
-        methodNotAllowed?: () => any;
+        methodNotAllowed?: (() => any) | undefined;
     }
 
     export interface ILayerOptions {
         name: string;
-        sensitive?: boolean;
-        strict?: boolean;
+        sensitive?: boolean | undefined;
+        strict?: boolean | undefined;
+        end?: boolean | undefined;
+        prefix?: string | undefined;
+        ignoreCaptures?: boolean | undefined;
     }
 
     export interface IUrlOptionsQuery {
@@ -125,7 +120,12 @@ declare namespace Router {
         path: string;
 
         constructor(path: string | RegExp, methods: string[], middleware: Router.IMiddleware, opts?: ILayerOptions);
-        constructor(path: string | RegExp, methods: string[], middleware: Array<Router.IMiddleware>, opts?: ILayerOptions);
+        constructor(
+            path: string | RegExp,
+            methods: string[],
+            middleware: Router.IMiddleware[],
+            opts?: ILayerOptions,
+        );
 
         /**
          * Returns whether request `path` matches route.
@@ -161,7 +161,7 @@ declare namespace Router {
 
 declare class Router<StateT = any, CustomT = {}> {
     params: Object;
-    stack: Array<Router.Layer>;
+    stack: Router.Layer[];
 
     /**
      * Create a new router.
@@ -190,9 +190,20 @@ declare class Router<StateT = any, CustomT = {}> {
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
     get(
-        path: string | RegExp | (string | RegExp)[],
+        path: string | RegExp | Array<string | RegExp>,
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
+    get<T, U>(
+        name: string,
+        path: string | RegExp,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
+    get<T, U>(
+        path: string | RegExp | Array<string | RegExp>,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
 
     /**
      * HTTP post method
@@ -203,9 +214,20 @@ declare class Router<StateT = any, CustomT = {}> {
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
     post(
-        path: string | RegExp | (string | RegExp)[],
+        path: string | RegExp | Array<string | RegExp>,
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
+    post<T, U>(
+        name: string,
+        path: string | RegExp,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
+    post<T, U>(
+        path: string | RegExp | Array<string | RegExp>,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
 
     /**
      * HTTP put method
@@ -216,9 +238,20 @@ declare class Router<StateT = any, CustomT = {}> {
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
     put(
-        path: string | RegExp | (string | RegExp)[],
+        path: string | RegExp | Array<string | RegExp>,
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
+    put<T, U>(
+        name: string,
+        path: string | RegExp,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
+    put<T, U>(
+        path: string | RegExp | Array<string | RegExp>,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
 
     /**
      * HTTP link method
@@ -229,9 +262,20 @@ declare class Router<StateT = any, CustomT = {}> {
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
     link(
-        path: string | RegExp | (string | RegExp)[],
+        path: string | RegExp | Array<string | RegExp>,
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
+    link<T, U>(
+        name: string,
+        path: string | RegExp,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
+    link<T, U>(
+        path: string | RegExp | Array<string | RegExp>,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
 
     /**
      * HTTP unlink method
@@ -242,9 +286,20 @@ declare class Router<StateT = any, CustomT = {}> {
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
     unlink(
-        path: string | RegExp | (string | RegExp)[],
+        path: string | RegExp | Array<string | RegExp>,
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
+    unlink<T, U>(
+        name: string,
+        path: string | RegExp,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
+    unlink<T, U>(
+        path: string | RegExp | Array<string | RegExp>,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
 
     /**
      * HTTP delete method
@@ -255,9 +310,20 @@ declare class Router<StateT = any, CustomT = {}> {
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
     delete(
-        path: string | RegExp | (string | RegExp)[],
+        path: string | RegExp | Array<string | RegExp>,
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
+    delete<T, U>(
+        name: string,
+        path: string | RegExp,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
+    delete<T, U>(
+        path: string | RegExp | Array<string | RegExp>,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
 
     /**
      * Alias for `router.delete()` because delete is a reserved word
@@ -268,9 +334,20 @@ declare class Router<StateT = any, CustomT = {}> {
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
     del(
-        path: string | RegExp | (string | RegExp)[],
+        path: string | RegExp | Array<string | RegExp>,
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
+    del<T, U>(
+        name: string,
+        path: string | RegExp,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
+    del<T, U>(
+        path: string | RegExp | Array<string | RegExp>,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
 
     /**
      * HTTP head method
@@ -281,9 +358,20 @@ declare class Router<StateT = any, CustomT = {}> {
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
     head(
-        path: string | RegExp | (string | RegExp)[],
+        path: string | RegExp | Array<string | RegExp>,
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
+    head<T, U>(
+        name: string,
+        path: string | RegExp,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
+    head<T, U>(
+        path: string | RegExp | Array<string | RegExp>,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
 
     /**
      * HTTP options method
@@ -294,12 +382,23 @@ declare class Router<StateT = any, CustomT = {}> {
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
     options(
-        path: string | RegExp | (string | RegExp)[],
+        path: string | RegExp | Array<string | RegExp>,
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
+    options<T, U>(
+        name: string,
+        path: string | RegExp,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
+    options<T, U>(
+        path: string | RegExp | Array<string | RegExp>,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
 
     /**
-     * HTTP path method
+     * HTTP patch method
      */
     patch(
         name: string,
@@ -307,9 +406,20 @@ declare class Router<StateT = any, CustomT = {}> {
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
     patch(
-        path: string | RegExp | (string | RegExp)[],
+        path: string | RegExp | Array<string | RegExp>,
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
+    patch<T, U>(
+        name: string,
+        path: string | RegExp,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
+    patch<T, U>(
+        path: string | RegExp | Array<string | RegExp>,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
 
     /**
      * Register route with all methods.
@@ -320,9 +430,20 @@ declare class Router<StateT = any, CustomT = {}> {
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
     all(
-        path: string | RegExp | (string | RegExp)[],
+        path: string | RegExp | Array<string | RegExp>,
         ...middleware: Array<Router.IMiddleware<StateT, CustomT>>
     ): Router<StateT, CustomT>;
+    all<T, U>(
+        name: string,
+        path: string | RegExp,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
+    all<T, U>(
+        path: string | RegExp | Array<string | RegExp>,
+        middleware: Koa.Middleware<T, U>,
+        routeHandler: Router.IMiddleware<StateT & T, CustomT & U>,
+    ): Router<StateT & T, CustomT & U>;
 
     /**
      * Set the path prefix for a Router instance that was already initialized.
@@ -344,9 +465,7 @@ declare class Router<StateT = any, CustomT = {}> {
      * an `Allow` header containing the allowed methods, as well as responding
      * with `405 Method Not Allowed` and `501 Not Implemented` as appropriate.
      */
-    allowedMethods(
-        options?: Router.IRouterAllowedMethodsOptions
-    ): Router.IMiddleware<StateT, CustomT>;
+    allowedMethods(options?: Router.IRouterAllowedMethodsOptions): Router.IMiddleware<StateT, CustomT>;
 
     /**
      * Redirect `source` to `destination` URL with optional 30x status `code`.
@@ -361,8 +480,8 @@ declare class Router<StateT = any, CustomT = {}> {
     register(
         path: string | RegExp,
         methods: string[],
-        middleware: Router.IMiddleware<StateT, CustomT>,
-        opts?: Object
+        middleware: Router.IMiddleware<StateT, CustomT> | Array<Router.IMiddleware<StateT, CustomT>>,
+        opts?: Router.ILayerOptions,
     ): Router.Layer;
 
     /**
@@ -388,7 +507,6 @@ declare class Router<StateT = any, CustomT = {}> {
      *
      * router.url('user', { id: 3 }, { query: "limit=1" });
      * // => "/users/3?limit=1"
-     *
      */
     url(name: string, params: any, options?: Router.IUrlOptionsQuery): string;
     url(name: string, params: any, options?: Router.IUrlOptionsQuery): Error;
@@ -401,7 +519,7 @@ declare class Router<StateT = any, CustomT = {}> {
     /**
      * Run middleware for named route parameters. Useful for auto-loading or validation.
      */
-    param(param: string, middleware: Router.IParamMiddleware): Router<StateT, CustomT>;
+    param(param: string, middleware: Router.IParamMiddleware<StateT, CustomT>): Router<StateT, CustomT>;
 
     /**
      * Generate URL from url pattern and given `params`.

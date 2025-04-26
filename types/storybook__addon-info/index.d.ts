@@ -1,38 +1,68 @@
-// Type definitions for @storybook/addon-info 3.4
-// Project: https://github.com/storybooks/storybook, https://github.com/storybooks/storybook/tree/master/addons/info
-// Definitions by: Mark Kornblum <https://github.com/mkornblum>
-//                 Mattias Wikstrom <https://github.com/fyrkant>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-// TypeScript Version: 2.8
-
-import * as React from 'react';
-import { RenderFunction, StoryDecorator } from '@storybook/react';
+import { DecoratorFunction, Parameters, StoryApi, StoryFn } from "@storybook/addons";
+import { StoryContext } from "@storybook/csf/dist/story";
+import { ComponentType, ReactElement } from "react";
 
 export interface WrapStoryProps {
-  storyFn?: RenderFunction;
-  context?: object;
-  options?: object;
+    storyFn?: StoryFn | undefined;
+    context?: object | undefined;
+    options?: object | undefined;
+}
+
+export interface TableComponentOptionProps {
+    propDefinitions: Array<{
+        property: string;
+        propType: object | string; // TODO: info about what this object is...
+        required: boolean;
+        description: string;
+        defaultValue: any;
+    }>;
 }
 
 export interface Options {
-  text?: string;
-  header?: boolean;
-  inline?: boolean;
-  source?: boolean;
-  propTables?: React.ComponentType[] | false;
-  propTablesExclude?: React.ComponentType[];
-  styles?: object;
-  marksyConf?: object;
-  maxPropsIntoLine?: number;
-  maxPropObjectKeys?: number;
-  maxPropArrayLength?: number;
-  maxPropStringLength?: number;
+    text?: string | undefined;
+    header?: boolean | undefined;
+    inline?: boolean | undefined;
+    source?: boolean | undefined;
+    propTables?: Array<ComponentType<any>> | false | undefined;
+    propTablesExclude?: Array<ComponentType<any>> | undefined;
+    styles?: object | undefined;
+    components?: {
+        [key: string]: ComponentType<any>;
+    } | undefined;
+    /**
+     * @deprecated "marksyConf" option has been renamed to "components"
+     */
+    marksyConf?: object | undefined;
+    maxPropsIntoLine?: number | undefined;
+    maxPropObjectKeys?: number | undefined;
+    maxPropArrayLength?: number | undefined;
+    maxPropStringLength?: number | undefined;
+    TableComponent?: ComponentType<TableComponentOptionProps> | undefined;
+    excludedPropTypes?: string[] | undefined;
 }
 
-// TODO: it would be better to use type inference for the parameters
-// type DecoratorParams = StoryDecorator extends (...a: infer A) => any ? A: never;
-export function withInfo(story: RenderFunction, context: { kind: string, story: string }): ReturnType<StoryDecorator>;
-// Legacy, but supported
-export function withInfo(textOrOptions?: string | Options): (storyFn: RenderFunction) => (context?: object) => React.ReactElement<WrapStoryProps>;
+export function withInfo<A = unknown>(
+    story: StoryFn<A>,
+    context: StoryContext<{ component: any; storyResult: A }>,
+): ReturnType<DecoratorFunction<A>>;
 
+// Legacy, but supported
+/**
+ * @deprecated withInfo wrapper is deprecated, use the info parameter globally or on each story
+ */
+export function withInfo(
+    textOrOptions?: string | Options,
+): (storyFn: StoryFn) => (context?: object) => ReactElement<WrapStoryProps>;
+
+/**
+ * @deprecated setDefaults is deprecated. Instead, you can pass options into withInfo(options) directly, or use the info parameter.
+ */
 export function setDefaults(newDefaults: Options): Options;
+
+declare module "@storybook/addons" {
+    interface ClientStoryApi<StoryFnReturnType = unknown> {
+        storiesOf(kind: string, module: NodeModule): StoryApi<StoryFnReturnType>;
+        addParameters(parameter: Parameters & { info: Options }): StoryApi<StoryFnReturnType>;
+        addDecorator(decorator: DecoratorFunction<StoryFnReturnType>): StoryApi<StoryFnReturnType>;
+    }
+}

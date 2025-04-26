@@ -1,15 +1,16 @@
-// Type definitions for rn-fetch-blob 1.2
-// Project: https://github.com/joltup/rn-fetch-blob#readme
-// Definitions by: Cao Peng <https://github.com/pengcao1>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-
 export const RNFetchBlob: RNFetchBlobStatic;
 export type RNFetchBlob = RNFetchBlobStatic;
 export default RNFetchBlob;
 
 interface RNFetchBlobStatic {
-    fetch(method: Methods, url: string, headers?: { [key: string]: string }, body?: {}
-        | null): StatefulPromise<FetchBlobResponse>;
+    fetch(
+        method: Methods,
+        url: string,
+        headers?: { [key: string]: string },
+        body?:
+            | {}
+            | null,
+    ): StatefulPromise<FetchBlobResponse>;
     base64: { encode(input: string): string; decode(input: string): string };
     android: AndroidApi;
     ios: IOSApi;
@@ -33,11 +34,11 @@ export interface Polyfill {
     Fetch: PolyfillFetch;
 }
 
-export declare class PolyfillFetch extends RNFetchBlobFetchPolyfill {
+export class PolyfillFetch extends RNFetchBlobFetchPolyfill {
     constructor(config: RNFetchBlobConfig);
 }
 
-export declare class RNFetchBlobFetchPolyfill {
+export class RNFetchBlobFetchPolyfill {
     constructor(config: RNFetchBlobConfig);
 
     build(): (url: string, options: RNFetchBlobConfig) => StatefulPromise<RNFetchBlobFetchRepsonse>;
@@ -129,13 +130,13 @@ export interface PolyfillFileReader extends EventTarget {
     result: number;
 }
 
-export declare namespace PolyfillFileReader {
+export namespace PolyfillFileReader {
     const EMPTY: number;
     const LOADING: number;
     const DONE: number;
 }
 
-export declare class PolyfillEvent {
+export class PolyfillEvent {
 }
 
 export interface PolyfillProgressEvent extends EventTarget {
@@ -144,7 +145,7 @@ export interface PolyfillProgressEvent extends EventTarget {
     total: number;
 }
 
-export declare class PolyfillBlob extends EventTarget {
+export class PolyfillBlob extends EventTarget {
     /**
      * RNFetchBlob Blob polyfill, create a Blob directly from file path, BASE64
      * encoded data, and string. The conversion is done implicitly according to
@@ -194,7 +195,7 @@ export declare class PolyfillBlob extends EventTarget {
     close(): Promise<void>;
 }
 
-export declare namespace PolyfillBlob {
+export namespace PolyfillBlob {
     function clearCache(): void;
 
     function build(data: any, cType: any): Promise<PolyfillBlob>;
@@ -202,7 +203,7 @@ export declare namespace PolyfillBlob {
     function setLog(level: number): void;
 }
 
-export declare class PolyfillFile extends PolyfillBlob {
+export class PolyfillFile extends PolyfillBlob {
 }
 
 export interface PolyfillXMLHttpRequest extends PolyfillXMLHttpRequestEventTarget {
@@ -252,7 +253,7 @@ export interface PolyfillXMLHttpRequest extends PolyfillXMLHttpRequestEventTarge
     responseType: string;
 }
 
-export declare namespace PolyfillXMLHttpRequest {
+export namespace PolyfillXMLHttpRequest {
     const binaryContentTypes: string[];
     const UNSENT: number;
     const OPENED: number;
@@ -382,8 +383,22 @@ export interface FS {
 
     slice(src: string, dest: string, start: number, end: number): Promise<void>;
     asset(path: string): string;
-    df(): Promise<{ free: number, total: number }>;
+    df(): Promise<RNFetchBlobDf>;
 }
+
+export interface RNFetchBlobDfIOS {
+    free?: number;
+    total?: number;
+}
+
+export interface RNFetchBlobDfAndroid {
+    external_free?: string;
+    external_total?: string;
+    internal_free?: string;
+    internal_total?: string;
+}
+
+export type RNFetchBlobDf = RNFetchBlobDfIOS & RNFetchBlobDfAndroid;
 
 export interface Dirs {
     DocumentDir: string;
@@ -409,7 +424,7 @@ export interface RNFetchBlobWriteStream {
 export interface RNFetchBlobReadStream {
     path: string;
     encoding: Encoding;
-    bufferSize?: number;
+    bufferSize?: number | undefined;
     closed: boolean;
     tick: number;
 
@@ -424,7 +439,7 @@ export interface RNFetchBlobReadStream {
 
 type Encoding = "utf8" | "ascii" | "base64";
 
-/* tslint:disable-next-line interface-name*/
+/* eslint-disable-next-line @typescript-eslint/naming-convention*/
 export interface IOSApi {
     /**
      * Open a file in {@link https://developer.apple.com/reference/uikit/uidocumentinteractioncontroller UIDocumentInteractionController},
@@ -470,7 +485,10 @@ export interface StatefulPromise<T> extends Promise<T> {
     /**
      * Add an event listener with custom configuration
      */
-    progress(config: { count?: number, interval?: number }, callback: (received: number, total: number) => void): StatefulPromise<FetchBlobResponse>;
+    progress(
+        config: { count?: number | undefined; interval?: number | undefined },
+        callback: (received: number, total: number) => void,
+    ): StatefulPromise<FetchBlobResponse>;
 
     /**
      * Add an event listener with custom configuration.
@@ -480,7 +498,10 @@ export interface StatefulPromise<T> extends Promise<T> {
     /**
      * Add an event listener with custom configuration
      */
-    uploadProgress(config: { count?: number, interval?: number }, callback: (sent: number, total: number) => void): StatefulPromise<FetchBlobResponse>;
+    uploadProgress(
+        config: { count?: number | undefined; interval?: number | undefined },
+        callback: (sent: number, total: number) => void,
+    ): StatefulPromise<FetchBlobResponse>;
 
     /**
      * An IOS only API, when IOS app turns into background network tasks will be terminated after ~180 seconds,
@@ -490,7 +511,7 @@ export interface StatefulPromise<T> extends Promise<T> {
     expire(callback: () => void): StatefulPromise<void>;
 }
 
-export declare class RNFetchBlobSession {
+export class RNFetchBlobSession {
     constructor(name: string, list: string[]);
 
     add(path: string): RNFetchBlobSession;
@@ -517,81 +538,81 @@ export interface RNFetchBlobConfig {
     /**
      * When this property is true, the downloaded data will overwrite the existing file. (true by default)
      */
-    overwrite?: boolean;
+    overwrite?: boolean | undefined;
 
     /**
      * Set timeout of the request (in milliseconds).
      */
-    timeout?: number;
+    timeout?: number | undefined;
 
     /**
      * Set this property to true to display a network indicator on status bar, this feature is only supported on IOS.
      */
-    indicator?: boolean;
+    indicator?: boolean | undefined;
 
     /**
      * Set this property to true will allow the request create connection with server have self-signed SSL
      * certification. This is not recommended to use in production.
      */
-    trusty?: boolean;
+    trusty?: boolean | undefined;
 
     /**
      * Set this property to true will makes response data of the fetch stored in a temp file, by default the temp
      * file will stored in App's own root folder with file name template RNFetchBlob_tmp${timestamp}.
      */
-    fileCache?: boolean;
+    fileCache?: boolean | undefined;
 
     /**
      * Set this property to change temp file extension that created by fetch response data.
      */
-    appendExt?: string;
+    appendExt?: string | undefined;
 
     /**
      * When this property has value, fetch API will try to store response data in the path ignoring fileCache and
      * appendExt property.
      */
-    path?: string;
+    path?: string | undefined;
 
-    session?: string;
+    session?: string | undefined;
 
-    addAndroidDownloads?: AddAndroidDownloads;
+    addAndroidDownloads?: AddAndroidDownloads | undefined;
 
     /**
      * Fix IOS request timeout issue #368 by change default request setting to defaultSessionConfiguration, and make backgroundSessionConfigurationWithIdentifier optional
      */
-    IOSBackgroundTask?: boolean;
+    IOSBackgroundTask?: boolean | undefined;
 }
 
 export interface AddAndroidDownloads {
     /**
      * download file using Android download manager or not.
      */
-    useDownloadManager?: boolean;
+    useDownloadManager?: boolean | undefined;
     /**
      * title of the file
      */
-    title?: string;
+    title?: string | undefined;
     /**
      * File description of the file.
      */
-    description?: string;
+    description?: string | undefined;
     /**
      * The destination which the file will be downloaded, it SHOULD be a location on external storage (DCIMDir).
      */
-    path?: string;
+    path?: string | undefined;
     /**
      * MIME type of the file. By default is text/plain
      */
-    mime?: string;
+    mime?: string | undefined;
     /**
      * A boolean value, see Officail Document
      * (https://developer.android.com/reference/android/app/DownloadManager.html#addCompletedDownload(java.lang.String, java.lang.String, boolean, java.lang.String, java.lang.String, long, boolean))
      */
-    mediaScannable?: boolean;
+    mediaScannable?: boolean | undefined;
     /**
      * A boolean value decide whether show a notification when download complete.
      */
-    notification?: boolean;
+    notification?: boolean | undefined;
 }
 
 export interface RNFetchBlobResponseInfo {
@@ -609,10 +630,10 @@ export interface RNFetchBlobStream {
     onEnd(): void;
 }
 
-export declare class RNFetchBlobFile {
+export class RNFetchBlobFile {
 }
 
-export declare class RNFetchBlobStat {
+export class RNFetchBlobStat {
     lastModified: string;
     size: string;
     type: "directory" | "file";

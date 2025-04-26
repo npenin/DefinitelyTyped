@@ -6,12 +6,14 @@ const slowerWithOptions = slowDown({
     windowMs: 15 * 60 * 1000, // 15 minutes,
     delayAfter: 1,
     delayMs: 0, // disabled
+    maxDelayMs: 20000,
     skipFailedRequests: false,
     skipSuccessfulRequests: true,
+    headers: true,
 });
 
 const slowerWithCallbacks = slowDown({
-    keyGenerator: (req, res) => req.ip,
+    keyGenerator: (req, res) => req.ip ?? "0.0.0.0",
     skip: (req, res) => false,
     onLimitReached: (req, res, opts) => {
         console.log(req.slowDown.current);
@@ -21,11 +23,11 @@ const slowerWithCallbacks = slowDown({
 });
 
 class MockStore implements slowDown.Store {
-    incr(key: string, cb: slowDown.StoreIncrementCallback) { }
-    decrement(key: string) { }
-    resetKey(key: string) { }
+    incr(key: string, cb: slowDown.StoreIncrementCallback) {}
+    decrement(key: string) {}
+    resetKey(key: string) {}
 }
 
 const slowerWithStore = slowDown({
-    store: new MockStore()
+    store: new MockStore(),
 });

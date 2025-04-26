@@ -1,10 +1,25 @@
 import braces = require("braces");
 
+const transform: braces.Transform = (str) => `foo_${str}`;
 const bracesOpts: braces.Options = {
+    transform,
     expand: true,
 };
 
-let strArrResult: string[];
+// $ExpectType string[]
+braces.expand("a/{x,y,z}/b");
 
-strArrResult = braces.expand('a/{x,y,z}/b');
-strArrResult = braces('a/{x,y,z}/b', bracesOpts);
+// $ExpectType string[]
+braces("x{a..e}y", bracesOpts);
+
+// $ExpectType string[]
+braces("x{\\a..e}y", { ...bracesOpts, keepEscaping: false });
+
+// $ExpectType string[]
+braces("x{\\a..e}y", { ...bracesOpts, keepEscaping: true });
+
+// $ExpectType string[]
+braces("file's{A,B}*.md", { ...bracesOpts, keepQuotes: false });
+
+// $ExpectType string[]
+braces("file's{A,B}*.md", { ...bracesOpts, keepQuotes: true });

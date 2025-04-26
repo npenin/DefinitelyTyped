@@ -1,13 +1,7 @@
-// Type definitions for fluent 0.10
-// Project: http://projectfluent.org
-// Definitions by: Huy Nguyen <https://github.com/huy-nguyen>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-// TypeScript Version: 2.2
-
 export interface FluentBundleContructorOptions {
-    functions?: object;
-    useIsolating?: boolean;
-    transform?: (...args: any[]) => any;
+    functions?: object | undefined;
+    useIsolating?: boolean | undefined;
+    transform?: ((...args: any[]) => any) | undefined;
 }
 
 export class FluentType {
@@ -16,7 +10,7 @@ export class FluentType {
     valueOf(): any;
 }
 
-export class FluentNone extends FluentType  {}
+export class FluentNone extends FluentType {}
 export class FluentNumber extends FluentType {}
 export class FluentDateTime extends FluentType {}
 
@@ -28,9 +22,12 @@ export class FluentResource extends Map {
 
 export class FluentBundle {
     constructor(locales: string | string[], options?: FluentBundleContructorOptions);
+    locales: string[];
+    messages: IterableIterator<[string, FluentNode[]]>;
+    hasMessage(id: string): boolean;
     addMessages(source: string): string[];
-    getMessage(id: string): FluentNode[];
-    format(message: FluentNode[], args?: object, errors?: string[]): string;
+    getMessage(id: string): FluentNode[] | undefined;
+    format(message: FluentNode[], args?: object, errors?: Array<string | Error>): string;
     addResource(res: FluentResource): string[];
 }
 

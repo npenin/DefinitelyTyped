@@ -1,20 +1,14 @@
-// Type definitions for sax-js 1.x
-// Project: https://github.com/isaacs/sax-js
-// Definitions by: Asana <https://asana.com>
-//                 Evert Pot <https://evertpot.com/>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 /// <reference types="node" />
 
+export const EVENTS: string[];
 
-export declare var EVENTS: string[];
-
-interface SAXOptions {
-    trim?: boolean;
-    normalize?: boolean;
-    lowercase?: boolean;
-    xmlns?: boolean;
-    noscript?: boolean;
-    position?: boolean;
+export interface SAXOptions {
+    trim?: boolean | undefined;
+    normalize?: boolean | undefined;
+    lowercase?: boolean | undefined;
+    xmlns?: boolean | undefined;
+    noscript?: boolean | undefined;
+    position?: boolean | undefined;
 }
 
 export interface QualifiedName {
@@ -28,7 +22,7 @@ export interface QualifiedAttribute extends QualifiedName {
     value: string;
 }
 
-interface BaseTag {
+export interface BaseTag {
     name: string;
     isSelfClosing: boolean;
 }
@@ -43,9 +37,9 @@ export interface Tag extends BaseTag {
     attributes: { [key: string]: string };
 }
 
-export declare function parser(strict: boolean, opt: SAXOptions): SAXParser;
-export declare class SAXParser {
-    constructor(strict: boolean, opt?: SAXOptions);
+export function parser(strict?: boolean, opt?: SAXOptions): SAXParser;
+export class SAXParser {
+    constructor(strict?: boolean, opt?: SAXOptions);
 
     // Methods
     end(): void;
@@ -63,15 +57,17 @@ export declare class SAXParser {
     closed: boolean;
     strict: boolean;
     opt: SAXOptions;
-    tag: string;
-    ENTITIES: {[key: string]: string};
+    tag: Tag;
+    ENTITIES: { [key: string]: string };
 
     // Events
     onerror(e: Error): void;
     ontext(t: string): void;
     ondoctype(doctype: string): void;
     onprocessinginstruction(node: { name: string; body: string }): void;
+    onsgmldeclaration(sgmlDecl: string): void;
     onopentag(tag: Tag | QualifiedTag): void;
+    onopentagstart(tag: Tag | QualifiedTag): void;
     onclosetag(tagName: string): void;
     onattribute(attr: { name: string; value: string }): void;
     oncomment(comment: string): void;
@@ -86,8 +82,30 @@ export declare class SAXParser {
 }
 
 import stream = require("stream");
-export declare function createStream(strict: boolean, opt: SAXOptions): SAXStream;
-export declare class SAXStream extends stream.Duplex {
-    constructor(strict: boolean, opt: SAXOptions);
-    private _parser: SAXParser;
+export function createStream(strict?: boolean, opt?: SAXOptions): SAXStream;
+export class SAXStream extends stream.Duplex {
+    constructor(strict?: boolean, opt?: SAXOptions);
+    _parser: SAXParser;
+    on(event: "text", listener: (this: this, text: string) => void): this;
+    on(event: "doctype", listener: (this: this, doctype: string) => void): this;
+    on(event: "processinginstruction", listener: (this: this, node: { name: string; body: string }) => void): this;
+    on(event: "sgmldeclaration", listener: (this: this, sgmlDecl: string) => void): this;
+    on(event: "opentag" | "opentagstart", listener: (this: this, tag: Tag | QualifiedTag) => void): this;
+    on(event: "closetag", listener: (this: this, tagName: string) => void): this;
+    on(event: "attribute", listener: (this: this, attr: { name: string; value: string }) => void): this;
+    on(event: "comment", listener: (this: this, comment: string) => void): this;
+    on(
+        event: "opencdata" | "closecdata" | "end" | "ready" | "close" | "readable" | "drain" | "finish",
+        listener: (this: this) => void,
+    ): this;
+    on(event: "cdata", listener: (this: this, cdata: string) => void): this;
+    on(
+        event: "opennamespace" | "closenamespace",
+        listener: (this: this, ns: { prefix: string; uri: string }) => void,
+    ): this;
+    on(event: "script", listener: (this: this, script: string) => void): this;
+    on(event: "data", listener: (this: this, chunk: any) => void): this;
+    on(event: "error", listener: (this: this, err: Error) => void): this;
+    on(event: "pipe" | "unpipe", listener: (this: this, src: stream.Readable) => void): this;
+    on(event: string | symbol, listener: (this: this, ...args: any[]) => void): this;
 }

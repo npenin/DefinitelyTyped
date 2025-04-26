@@ -1,49 +1,45 @@
+/// <reference types="node" />
 
+import hash = require("object-hash");
+import stream = require("stream");
 
-import hash = require('object-hash');
+const obj = { any: true };
 
-var hashed: string;
+interface MyInterface {
+    a: string;
+}
 
-var obj = { any: true };
+const obj2: MyInterface = { a: "a" };
 
-// hash object
-hashed = hash(obj);
-
-hashed = hash.sha1(obj);
-hashed = hash.keys(obj);
-hashed = hash.MD5(obj);
-hashed = hash.keysMD5(obj);
-
-var options = {
-	algorithm: 'md5',
-	encoding: 'utf8',
-	excludeValues: true,
-	unorderedArrays: true
+const options: hash.Options = {
+    algorithm: "md5",
+    encoding: "hex",
+    excludeValues: true,
+    unorderedArrays: true,
 };
 
-hashed = hash(obj, options);
+hash(obj); // $ExpectType string
+hash(obj2); // $ExpectType string
+// @ts-expect-error
+hash(undefined);
+hash("1"); // $ExpectType string
+hash(1); // $ExpectType string
+hash(true); // $ExpectType string
+hash(null); // $ExpectType string
+hash([1, 2, 3]); // $ExpectType string
+hash([1, "2", 3, true]); // $ExpectType string
+hash(["1", "1", "3"]); // $ExpectType string
+hash([{ objectInArray: true }]); // $ExpectType string
+hash(obj, options); // $ExpectType string
+hash(obj, { ...options, algorithm: "sha256" }); // $ExpectType string
+hash(obj, { ...options, encoding: "buffer" }); // $ExpectType Buffer || Buffer<ArrayBufferLike>
+hash({ name: "Peter", stapler: false, friends: ["Joanna", "Michael", "Samir"] }); // $ExpectType string
 
-// HashTable
-var table: any;
-table = hash.HashTable();
-table = hash.HashTable(options);
+hash.sha1(obj); // $ExpectType string
+hash.keys(obj); // $ExpectType string
+hash.MD5(obj); // $ExpectType string
+hash.keysMD5(obj); // $ExpectType string
 
-table = table.add(obj);
-table = table.add(obj, obj);
-table = table.remove(obj);
-table = table.remove(obj, obj);
-
-var has: boolean = table.hasKey('whatEver');
-var value: any = table.getValue('whatEver');
-var count: number = table.getCount('whatEver');
-
-var tableObject = table.table();
-tableObject['whatEver'].value;
-tableObject['whatEver'].count;
-
-var tableArray = table.toArray();
-tableArray.shift().value;
-tableArray.pop().count;
-tableArray[2].hash;
-
-table = table.reset();
+const passThroughStream = new stream.PassThrough();
+hash.writeToStream(obj, passThroughStream);
+passThroughStream.read().toString();

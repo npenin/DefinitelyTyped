@@ -1,102 +1,80 @@
-// Type definitions for Rebass 3.0
-// Project: https://github.com/rebassjs/rebass
-// Definitions by: rhysd <https://github.com/rhysd>
-//                 ryee-dev <https://github.com/ryee-dev>
-//                 jamesmckenzie <https://github.com/jamesmckenzie>
-//                 sara f-p <https://github.com/gretzky>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-// TypeScript Version: 2.8
-
+import { ResponsiveStyleValue, SystemStyleObject } from "@styled-system/css";
 import * as React from "react";
+import * as StyledComponents from "styled-components";
+import * as StyledSystem from "styled-system";
 
-export interface BaseProps<C> extends React.ClassAttributes<C> {
-    className?: string;
-    as?: any;
+export {};
+
+type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
+
+export interface BaseProps extends React.RefAttributes<any> {
+    as?: React.ElementType | undefined;
+    css?: StyledComponents.CSSObject | StyledComponents.FlattenSimpleInterpolation | string | undefined;
 }
 
-export interface SpaceProps<C> extends BaseProps<C> {
-    m?: number | string | ReadonlyArray<number>;
-    mt?: number | string | ReadonlyArray<number>;
-    mr?: number | string | ReadonlyArray<number>;
-    mb?: number | string | ReadonlyArray<number>;
-    ml?: number | string | ReadonlyArray<number>;
-    mx?: number | string | ReadonlyArray<number>;
-    my?: number | string | ReadonlyArray<number>;
-    p?: number | string | ReadonlyArray<number>;
-    pt?: number | string | ReadonlyArray<number>;
-    pr?: number | string | ReadonlyArray<number>;
-    pb?: number | string | ReadonlyArray<number>;
-    pl?: number | string | ReadonlyArray<number>;
-    px?: number | string | ReadonlyArray<number>;
-    py?: number | string | ReadonlyArray<number>;
+/**
+ * The `SxStyleProp` extension `SystemStyleObject` and `Emotion` [style props](https://emotion.sh/docs/object-styles)
+ * such that properties that are part of the `Theme` will be transformed to
+ * their corresponding values. Other valid CSS properties are also allowed.
+ */
+export type SxStyleProp =
+    | SystemStyleObject
+    | Record<
+        string,
+        | SystemStyleObject
+        | ResponsiveStyleValue<number | string>
+        | Record<string, SystemStyleObject | ResponsiveStyleValue<number | string>>
+    >;
+
+export interface SxProps {
+    /**
+     * The sx prop lets you style elements inline, using values from your theme.
+     */
+    sx?: SxStyleProp | undefined;
 }
 
-export interface BoxProps extends SpaceProps<BoxClass> {
-    className?: string;
-    width?: number | string | ReadonlyArray<number>;
-    fontSize?: number | ReadonlyArray<number>;
-    css?: object;
-    color?: string;
-    bg?: string;
+interface BoxKnownProps
+    extends
+        BaseProps,
+        StyledSystem.SpaceProps,
+        StyledSystem.LayoutProps,
+        StyledSystem.TypographyProps,
+        StyledSystem.ColorProps,
+        StyledSystem.FlexboxProps,
+        SxProps
+{
+    variant?: StyledSystem.ResponsiveValue<string> | undefined;
+    tx?: string | undefined;
 }
-// tslint:disable-next-line:strict-export-declare-modifiers
-type BoxClass = React.FunctionComponent<BoxProps>;
-export const Box: BoxClass;
+export interface BoxProps extends BoxKnownProps, Omit<React.HTMLProps<HTMLDivElement>, keyof BoxKnownProps> {}
+export const Box: React.FunctionComponent<BoxProps>;
 
-export interface ButtonProps extends BoxProps {
-    fontWeight?: string;
-    border?: number | string;
-    borderColor?: string;
-    borderRadius?: number | string;
-    variant?: string;
-}
+interface ButtonKnownProps extends BoxKnownProps, StyledSystem.FontWeightProps, StyledSystem.ButtonStyleProps {}
+export interface ButtonProps
+    extends ButtonKnownProps, Omit<React.HTMLProps<HTMLButtonElement>, keyof ButtonKnownProps>
+{}
 export const Button: React.FunctionComponent<ButtonProps>;
 
-export interface CardProps extends BoxProps {
-    border?: number | string;
-    borderColor?: string;
-    borderRadius?: number | string;
-    boxShadow?: string;
-    backgroundImage?: string;
-    backgroundSize?: string;
-    backgroundPosition?: string;
-    backgroundRepeat?: string;
-    opacity?: number;
-    variant?: string;
-}
+export interface CardProps extends BoxKnownProps, Omit<React.HTMLProps<HTMLDivElement>, keyof BoxKnownProps> {}
 export const Card: React.FunctionComponent<CardProps>;
 
-export interface FlexProps extends BoxProps {
-    alignItems?: string;
-    justifyContent?: string;
-    flexDirection?: string;
-    flexWrap?: string;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface FlexKnownProps extends BoxKnownProps {}
+export interface FlexProps extends FlexKnownProps, Omit<React.HTMLProps<HTMLDivElement>, keyof FlexKnownProps> {}
 export const Flex: React.FunctionComponent<FlexProps>;
 
-export interface ImageProps extends BoxProps {
-    height?: number | string;
-    borderRadius?: number | string;
-    src?: string;
-    alt?: string;
-}
+export interface ImageProps extends BoxKnownProps, Omit<React.HTMLProps<HTMLImageElement>, keyof BoxKnownProps> {}
 export const Image: React.FunctionComponent<ImageProps>;
 
-export interface LinkProps extends BoxProps {
-    href?: string;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface LinkKnownProps extends BoxKnownProps {}
+export interface LinkProps extends LinkKnownProps, Omit<React.HTMLProps<HTMLAnchorElement>, keyof LinkKnownProps> {}
 export const Link: React.FunctionComponent<LinkProps>;
 
-export interface TextProps extends BoxProps {
-    fontSize?: number | ReadonlyArray<number>;
-    fontWeight?: string;
-    color?: string;
-    fontFamily?: string;
-    textAlign?: string;
-    lineHeight?: number | string;
-    letterSpacing?: number | string;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface TextKnownProps extends BoxKnownProps {}
+export interface TextProps extends TextKnownProps, Omit<React.HTMLProps<HTMLDivElement>, keyof TextKnownProps> {}
 export const Text: React.FunctionComponent<TextProps>;
 
-export type HeadingProps = TextProps;
+export interface HeadingProps extends TextKnownProps, Omit<React.HTMLProps<HTMLHeadingElement>, keyof TextKnownProps> {}
 export const Heading: React.FunctionComponent<HeadingProps>;

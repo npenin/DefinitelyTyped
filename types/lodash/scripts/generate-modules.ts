@@ -56,7 +56,7 @@ async function globalDefinitionText(moduleName: string): Promise<string> {
 // Project: http://lodash.com/
 // Definitions by: Brian Zengel <https://github.com/bczengel>, Ilya Mochalov <https://github.com/chrootsu>, Stepan Mikhaylyuk <https://github.com/stepancar>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-// TypeScript Version: 2.6
+// TypeScript Version: 2.8
 
 // Generated from https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/lodash/scripts/generate-modules.ts
 
@@ -85,7 +85,7 @@ function compilerOptions(): object {
     };
 }
 
-function lodashTsconfig(moduleNames: ReadonlyArray<string>): string {
+function lodashTsconfig(moduleNames: readonly string[]): string {
     return JSON.stringify({
         compilerOptions: compilerOptions(),
         files: [
@@ -104,7 +104,7 @@ function lodashDotFooTsconfig(): string {
 }
 
 function tslint(): string {
-    return `{ "extends": "dtslint/dt.json" }\n`;
+    return `{ "extends": "@definitelytyped/dtslint/dt.json" }\n`;
 }
 
 function loadString(url: string): Promise<string> {

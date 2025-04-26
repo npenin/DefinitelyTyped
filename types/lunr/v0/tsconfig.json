@@ -6,17 +6,8 @@
         ],
         "noImplicitAny": true,
         "noImplicitThis": false,
-        "strictNullChecks": false,
+        "strictNullChecks": true,
         "strictFunctionTypes": true,
-        "baseUrl": "../../",
-        "typeRoots": [
-            "../../"
-        ],
-        "paths": {
-            "lunr": [
-                "lunr/v0"
-            ]
-        },
         "types": [],
         "noEmit": true,
         "forceConsistentCasingInFileNames": true

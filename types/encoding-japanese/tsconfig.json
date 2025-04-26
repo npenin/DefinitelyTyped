@@ -6,18 +6,15 @@
         ],
         "noImplicitAny": true,
         "noImplicitThis": true,
-        "strictNullChecks": false,
+        "strictNullChecks": true,
         "strictFunctionTypes": true,
-        "baseUrl": "../",
-        "typeRoots": [
-            "../"
-        ],
         "types": [],
         "noEmit": true,
         "forceConsistentCasingInFileNames": true
     },
     "files": [
         "index.d.ts",
-        "encoding-japanese-tests.ts"
+        "test/encoding-japanese-tests.cjs.ts",
+        "test/encoding-japanese-tests.global.ts"
     ]
 }

@@ -1,11 +1,4 @@
-// Type definitions for theo 8.1
-// Project: https://github.com/salesforce-ux/theo
-// Definitions by: Pete Petrash <https://github.com/petekp>
-//                 Niko Laitinen <https://github.com/laitine>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-// TypeScript Version: 3.2
-
-import { Collection, Map, List, OrderedMap } from "immutable";
+import { Collection, List, Map, OrderedMap } from "immutable";
 
 export type StyleProperty =
     | "name"
@@ -35,21 +28,16 @@ export type Format =
     | "android.xml"
     | "aura.tokens";
 
-export function convert(options: ConvertOptions): Promise<string>;
-export function convertSync(options: ConvertOptions): string;
-export function registerFormat(
-    name: string,
-    format: FormatResultFn | string
-): void;
-export function registerTransform(
-    name: string,
-    valueTransforms: string[]
-): void;
-export function registerValueTransform(
-    name: string,
-    predicate: (prop: Prop) => boolean,
-    transform: (prop: Prop) => string | number
-): void;
+export type Transform = "raw" | "ios" | "android" | "web";
+
+export type ValueTransform =
+    | "color/rgb"
+    | "color/hex"
+    | "color/hex8rgba"
+    | "color/hex8argb"
+    | "percentage/float"
+    | "relative/pixel"
+    | "relative/pixelValue";
 
 export type Prop = Map<StyleProperty, string | number>;
 export type Props = List<Prop>;
@@ -59,8 +47,8 @@ export type FormatResultFn = (result: ImmutableStyleMap) => string;
 
 export interface StyleMap {
     aliases: Aliases;
-    global?: Props;
-    imports?: string[];
+    global?: Props | undefined;
+    imports?: string[] | undefined;
     props: Props;
     meta: Meta;
     options: object;
@@ -74,20 +62,38 @@ export interface ImmutableStyleMap extends Map<string, any> {
 export interface ConvertOptions {
     transform: TransformOptions;
     format: FormatOptions;
-    resolveAliases?: boolean;
-    resolveMetaAliases?: boolean;
+    resolveAliases?: boolean | undefined;
+    resolveMetaAliases?: boolean | undefined;
 }
 
-export interface TransformOptions {
-    type?: string;
+export interface TransformOptions<T extends string = never> {
+    type?: Transform | T | undefined;
     file: string;
-    data?: string;
+    data?: string | undefined;
 }
 
 export interface FormatOptions {
     type: Format;
-    options?: (
-        options: object,
-        transformPropName?: (name: string) => string
-    ) => void;
+    options?:
+        | ((
+            options: object,
+            transformPropName?: (name: string) => string,
+        ) => void)
+        | undefined;
 }
+
+export function convert(options: ConvertOptions): Promise<string>;
+export function convertSync(options: ConvertOptions): string;
+export function registerFormat<T extends string = never>(
+    name: Format | T,
+    format: FormatResultFn | string,
+): void;
+export function registerTransform<
+    T extends string = never,
+    V extends string = never,
+>(name: Transform | T, valueTransforms: ValueTransform[] | V[]): void;
+export function registerValueTransform<T extends string = never>(
+    name: ValueTransform | T,
+    predicate: (prop: Prop) => boolean,
+    transform: (prop: Prop) => string | number,
+): void;

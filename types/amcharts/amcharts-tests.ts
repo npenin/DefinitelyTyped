@@ -11,15 +11,18 @@ const chart = AmCharts.makeChart("chartdiv", {
     type: "gauge",
     arrows: [
         {
-            value: 130
-        }
+            value: 130,
+        },
     ],
     titles: [
         {
             text: "Speedometer",
-            size: 15
-        }
+            size: 15,
+        },
     ],
+    export: {
+        enabled: true,
+    },
     axes: [
         {
             bottomText: "0 km/h",
@@ -29,22 +32,36 @@ const chart = AmCharts.makeChart("chartdiv", {
                 {
                     color: "#00CC00",
                     endValue: 90,
-                    startValue: 0
+                    startValue: 0,
                 },
                 {
                     color: "#ffac29",
                     endValue: 130,
-                    startValue: 90
+                    startValue: 90,
                 },
                 {
                     color: "#ea3838",
                     endValue: 220,
                     startValue: 130,
-                    innerRadius: "95%"
-                }
-            ]
-        }
-    ]
+                    innerRadius: "95%",
+                },
+            ],
+        },
+    ],
+});
+
+chart.export.capture(null, () => {
+    chart.export.toJPG(null, data => console.log(data));
+    chart.export.toPNG(null, data => console.log(data));
+    chart.export.toSVG(null, data => console.log(data));
+    chart.export.toPDF(null, data => console.log(data));
+    chart.export.toJSON(null, data => console.log(data));
+    chart.export.toCSV(null, data => console.log(data));
+    chart.export.toXLSX(null, data => console.log(data));
+    chart.export.toBlob(null, data => console.log(data));
+    chart.export.toCanvas(null, data => console.log(data));
+    chart.export.toArray(null, data => console.log(data));
+    chart.export.toImage(null, data => console.log(data));
 });
 
 // Object based API.

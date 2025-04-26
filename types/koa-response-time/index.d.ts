@@ -1,11 +1,19 @@
-// Type definitions for koa-response-time 2.0
-// Project: https://github.com/koajs/response-time#readme
-// Definitions by: Thor Sedeke <https://github.com/thorsedeke>
-//                 Steven McDowall <https://github.com/sjmcdowall>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-// TypeScript Version: 2.3
+import { Middleware } from "koa";
 
-import { Middleware } from 'koa';
+interface KoaResponseTimeOptions {
+    hrtime?: boolean | undefined;
+}
 
-declare function koa_response_time(): Middleware;
+/**
+ * Add X-Response-Time header field.
+ * @param options options dictionary. { hrtime }
+ *
+ *        hrtime: boolean.
+ *          `true` to use time in nanoseconds.
+ *          `false` to use time in milliseconds.
+ *          Default is `false` to keep back compatible.
+ * @api public
+ */
+declare function koa_response_time(options?: KoaResponseTimeOptions): Middleware;
+
 export = koa_response_time;

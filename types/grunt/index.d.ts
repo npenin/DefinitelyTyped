@@ -1,8 +1,3 @@
-// Type definitions for Grunt 0.4.x
-// Project: http://gruntjs.com
-// Definitions by: Jeff May <https://github.com/jeffmay>, Basarat Ali Syed <https://github.com/basarat>
-// Definitions: https://github.com/jeffmay/DefinitelyTyped
-
 /// <reference types="node" />
 
 /**
@@ -20,16 +15,15 @@ interface String {
 }
 
 declare namespace node {
-
     /**
      * {@link http://npmjs.org/doc/json.html}
      */
     interface NodePackage {
         name: string;
         version: string;
-        description?: string;
-        keywords?: string[];
-        homepage?: string;
+        description?: string | undefined;
+        keywords?: string[] | undefined;
+        homepage?: string | undefined;
     }
 }
 
@@ -37,7 +31,6 @@ declare namespace node {
  * {@link https://github.com/isaacs/minimatch}
  */
 declare namespace minimatch {
-
     /**
      * A minimal matching utility options.
      *
@@ -53,61 +46,61 @@ declare namespace minimatch {
         /**
          * Dump a ton of stuff to stderr.
          */
-        debug?: boolean;
+        debug?: boolean | undefined;
 
         /**
          * Do not expand {a,b} and {1..3} brace sets.
          */
-        nobrace?: boolean;
+        nobrace?: boolean | undefined;
 
         /**
          * Disable ** matching against multiple folder names.
          */
-        noglobstar?: boolean;
+        noglobstar?: boolean | undefined;
 
         /**
          * Allow patterns to match filenames starting with a period,
          * even if the pattern does not explicitly have a period in that spot.
          */
         // Note that by default, a/**\/b will not match a/.d/b, unless dot is set.
-        dot?: boolean;
+        dot?: boolean | undefined;
 
         /**
          * Disable "extglob" style patterns like +(a|b).
          */
-        noext?: boolean;
+        noext?: boolean | undefined;
 
         /**
          * Perform a case-insensitive match.
          */
-        nocase?: boolean;
+        nocase?: boolean | undefined;
 
         /**
          * When a match is not found by minimatch.match, return a list containing the pattern itself.
          * When set, an empty list is returned if there are no matches.
          */
-        nonull?: boolean;
+        nonull?: boolean | undefined;
 
         /**
          * If set, then patterns without slashes will be matched against the basename of the path if it contains slashes.
          * For example, a?b would match the path /xyz/123/acb, but not /xyz/acb/123.
          */
-        matchBase?: boolean;
+        matchBase?: boolean | undefined;
 
         /**
          * Suppress the behavior of treating # at the start of a pattern as a comment.
          */
-        nocomment?: boolean;
+        nocomment?: boolean | undefined;
 
         /**
          * Suppress the behavior of treating a leading ! character as negation.
          */
-        nonegate?: boolean;
+        nonegate?: boolean | undefined;
 
         /**
          * Returns from negate expressions the same as if they were not negated. (Ie, true on a hit, false on a miss.)
          */
-        flipNegate?: boolean;
+        flipNegate?: boolean | undefined;
     }
 }
 
@@ -115,13 +108,11 @@ declare namespace minimatch {
  *********************/
 
 declare namespace grunt {
-
     namespace config {
-
         /**
          * {@link http://gruntjs.com/sample-gruntfile}
          */
-        interface IProjectConfig{
+        interface IProjectConfig {
             [plugin: string]: any;
         }
 
@@ -206,7 +197,6 @@ declare namespace grunt {
          * {@link https://github.com/hij1nx/EventEmitter2}
          */
         interface EventModule {
-
             /**
              * Adds a listener to the end of the listeners array for the specified event.
              */
@@ -277,7 +267,6 @@ declare namespace grunt {
     }
 
     namespace fail {
-
         enum ErrorCode {
             NoError = 0,
             Fatal = 1,
@@ -289,7 +278,6 @@ declare namespace grunt {
         }
 
         interface FailModule {
-
             /**
              * Display a warning and abort Grunt immediately.
              * Grunt will continue processing tasks if the --force command-line option was specified.
@@ -306,7 +294,6 @@ declare namespace grunt {
     }
 
     namespace file {
-
         /**
          * {@link http://gruntjs.com/api/grunt.file#grunt.file.defaultencoding}
          */
@@ -320,7 +307,7 @@ declare namespace grunt {
          * @see IFileWriteBufferOption
          * @see IFileWriteStringOption
          */
-        interface IFileWriteOptions {
+        interface IFileWriteOptions extends grunt.file.IFileEncodedOption {
             /**
              * These optional globbing patterns will be matched against the filepath
              * (not the filename) using grunt.file.isMatch. If any specified globbing
@@ -341,7 +328,7 @@ declare namespace grunt {
              * whose return value will be used as the destination file's contents. If
              * this function returns `false`, the file copy will be aborted.
              */
-            process?: (buffer: Buffer) => boolean;
+            process?: ((buffer: Buffer) => boolean) | undefined;
         }
 
         /**
@@ -349,18 +336,30 @@ declare namespace grunt {
          */
         interface IFileWriteStringOption extends grunt.file.IFileWriteOptions {
             /**
-             * The source file contents and file path are passed into this function,
-             * whose return value will be used as the destination file's contents. If
-             * this function returns `false`, the file copy will be aborted.
-             */
-            process?: (file: string) => boolean;
+            * The source file contents, source file path, and destination file path
+            * are passed into this function, whose return value will be used as the
+            * destination file's contents.
+            * If this function returns 'false', the file copy will be aborted.
+            * @example
+            ```ts
+const copyOptions: grunt.file.IFileWriteStringOption = {
+  encoding: options.encoding,
+  process: (contents: string, srcpath: string, destpath: string): string | boolean => {
+      // some other code
+      // return the content to be written or return false to cancel
+      return contents;
+  },
+  noProcess: options.noProcess,
+};
+            ```
+            */
+            process?: ((contents: string, srcpath: string, destpath: string) => string | boolean) | undefined;
         }
 
         /**
          * {@link http://gruntjs.com/api/grunt.file}
          */
         interface FileModule {
-
             /**
              * Set this property to change the default encoding used by all grunt.file methods.
              * Defaults to 'utf8'.
@@ -413,7 +412,7 @@ declare namespace grunt {
              *
              * @return true if the files could be deleted, otherwise false.
              */
-            delete(filepath: string, options?: { force?: boolean }): boolean;
+            delete(filepath: string, options?: { force?: boolean | undefined }): boolean;
 
             /**
              * Works like mkdir -p. Create a directory along with any intermediate directories.
@@ -433,7 +432,7 @@ declare namespace grunt {
              */
             recurse(
                 rootdir: string,
-                callback: (abspath: string, rootdir: string, subdir: string, filename: string) => void
+                callback: (abspath: string, rootdir: string, subdir: string, filename: string) => void,
             ): void;
 
             /**
@@ -456,7 +455,7 @@ declare namespace grunt {
              * @see FileModule.expand method documentation for an explanation of how the patterns
              *      and options arguments may be specified.
              */
-            expandMapping(patterns: string[], dest: string, options: IExpandedFilesConfig): Array<IFileMap>;
+            expandMapping(patterns: string[], dest: string, options: IExpandedFilesConfig): IFileMap[];
 
             /**
              * Match one or more globbing patterns against one or more file paths.
@@ -488,7 +487,6 @@ declare namespace grunt {
             isMatch(options: minimatch.IMinimatchOptions, pattern: string, filepaths: string[]): boolean;
             isMatch(options: minimatch.IMinimatchOptions, patterns: string[], filepath: string): boolean;
             isMatch(options: minimatch.IMinimatchOptions, patterns: string[], filepaths: string[]): boolean;
-
 
             /*
              * Like the Node.js path.join method, the methods below will
@@ -560,22 +558,21 @@ declare namespace grunt {
          * {@link http://gruntjs.com/configuring-tasks#files}
          */
         interface IFilesConfig extends minimatch.IMinimatchOptions {
-
             /**
              * Pattern(s) to match, relative to the {@link IExpandedFilesConfig.cwd}.
              */
-            src?: string[];
+            src?: string[] | undefined;
 
             /**
              * Destination path prefix.
              */
-            dest?: string;
+            dest?: string | undefined;
 
             /**
              * Process a dynamic src-dest file mapping,
              * @see {@link http://gruntjs.com/configuring-tasks#building-the-files-object-dynamically for more information.
-            */
-            expand?: boolean; // = false
+             */
+            expand?: boolean | undefined; // = false
 
             /**
              * Either a valid fs.Stats method name:
@@ -600,33 +597,32 @@ declare namespace grunt {
              * Patterns will be matched relative to this path, and all returned filepaths will
              * also be relative to this path.
              */
-            cwd?: string;
+            cwd?: string | undefined;
         }
 
         /**
          * These are valid for compact-format
          */
         interface IExpandedFilesConfig extends IFilesConfig {
-
             /**
              * Enables the following options
              */
-            expand?: boolean; // = true
+            expand?: boolean | undefined; // = true
 
             /**
              * All {@link IExpandedFilesConfig.src} matches are relative to (but don't include) this path.
              */
-            cwd?: string;
+            cwd?: string | undefined;
 
             /**
              * Replace any existing extension with this value in generated {@link IExpandedFilesConfig.dest} paths.
              */
-            ext?: string;
+            ext?: string | undefined;
 
             /**
              * Remove all path parts from generated {@link IExpandedFilesConfig.dest} paths.
              */
-            flatten?: boolean;
+            flatten?: boolean | undefined;
 
             /**
              * This function is called for each matched src file, (after extension renaming and flattening).
@@ -634,7 +630,7 @@ declare namespace grunt {
              * and this function must return a new dest value.
              * If the same dest is returned more than once, each src which used it will be added to an array of sources for it.
              */
-            rename?: Function;
+            rename?: Function | undefined;
         }
 
         /**
@@ -653,14 +649,12 @@ declare namespace grunt {
     }
 
     namespace log {
-
         /**
          * Grunt output should look consistent, and maybe even pretty.
          * As such, there is a plethora of logging methods, and a few useful patterns.
          * All of the methods that actually log something are chainable.
          */
         interface CommonLogging<T> {
-
             /**
              * Log the specified msg string, with no trailing newline.
              */
@@ -734,12 +728,10 @@ declare namespace grunt {
     }
 
     namespace option {
-
         /**
          * {@link http://gruntjs.com/api/grunt.option}
          */
         interface OptionModule {
-
             /**
              * Gets or sets an option.
              * Boolean options can be negated by prepending no- onto the key. For example:
@@ -763,16 +755,13 @@ declare namespace grunt {
              */
             flags: grunt.IFlag[];
         }
-
     }
 
     namespace task {
-
         /**
          * {@link http://gruntjs.com/api/grunt.task}
          */
         interface CommonTaskModule {
-
             /**
              * If a task list is specified, the new task will be an alias for one or more other tasks.
              * Whenever this "alias task" is run, every specified task in taskList will be run, in the order specified.
@@ -792,7 +781,11 @@ declare namespace grunt {
              * @note taskFunction.apply(scope: grunt.task.ITask, args: any[])
              */
             registerTask(taskName: string, taskFunction: (this: ITask, ...args: any[]) => void): void;
-            registerTask(taskName: string, description: string, taskFunction: (this: ITask, ...args: any[]) => void): void;
+            registerTask(
+                taskName: string,
+                description: string,
+                taskFunction: (this: ITask, ...args: any[]) => void,
+            ): void;
 
             /**
              * Register a "multi task." A multi task is a task that implicitly iterates over all of its
@@ -803,7 +796,11 @@ declare namespace grunt {
              * @note taskFunction.apply(scope: grunt.task.IMultiTask<any>, args: any[])
              */
             registerMultiTask(taskName: string, taskFunction: (this: IMultiTask<any>, ...args: any[]) => void): void;
-            registerMultiTask(taskName: string, taskDescription: string, taskFunction: (this: IMultiTask<any>, ...args: any[]) => void): void;
+            registerMultiTask(
+                taskName: string,
+                taskDescription: string,
+                taskFunction: (this: IMultiTask<any>, ...args: any[]) => void,
+            ): void;
 
             /**
              * Check with the name, if a task exists in the registered tasks.
@@ -843,7 +840,7 @@ declare namespace grunt {
              * Normalizes a task target configuration object into an array of src-dest file mappings.
              * This method is used internally by the multi task system this.files / grunt.task.current.files property.
              */
-            normalizeMultiTaskFiles(data: grunt.config.IProjectConfig, targetname?: string): Array<grunt.file.IFileMap>;
+            normalizeMultiTaskFiles(data: grunt.config.IProjectConfig, targetname?: string): grunt.file.IFileMap[];
 
             /**
              * The currently running task or multitask.
@@ -869,7 +866,6 @@ declare namespace grunt {
          * Grunt version 0.4.x
          */
         interface ITask {
-
             /**
              * If a task is asynchronous, this method must be invoked to instruct Grunt to wait.
              * It returns a handle to a "done" function that should be called when the task has completed.
@@ -895,9 +891,9 @@ declare namespace grunt {
              * @note that this won't actually run the specified task(s),
              * it will just fail the current task if they haven't already run successfully.
              */
-            requires(tasks: string[]): void
-            requires(tasks: string, ...otherTasks: string[]): void
-            requires(tasks: string[], ...otherTasks: string[][]): void
+            requires(tasks: string[]): void;
+            requires(tasks: string, ...otherTasks: string[]): void;
+            requires(tasks: string[], ...otherTasks: string[][]): void;
 
             /**
              * Fail the current task if one or more required config properties is missing.
@@ -932,7 +928,7 @@ declare namespace grunt {
              * For example, if a "sample" task was run as grunt sample:foo:bar,
              * inside the task function, this.flags would be {foo: true, bar: true}.
              */
-            flags: grunt.IFlag[];
+            flags: grunt.IFlag;
 
             /**
              * The number of grunt.log.error calls that occurred during this task.
@@ -1006,7 +1002,6 @@ declare namespace grunt {
          * @see ITaskCompactOptions
          */
         interface ITaskOptions {
-
             options?: any;
 
             // files?: grunt.file.IFilesArray
@@ -1021,9 +1016,7 @@ declare namespace grunt {
     }
 
     namespace template {
-
         interface TemplateModule {
-
             /**
              * Process a Lo-Dash template string.
              *
@@ -1078,12 +1071,10 @@ declare namespace grunt {
     }
 
     namespace util {
-
         /**
          * {@link http://gruntjs.com/api/grunt.util}
          */
         interface UtilModule {
-
             /**
              * Return the "kind" of a value. Like typeof but returns the internal [Class](Class/) value.
              * Possible results are "number", "string", "boolean", "function", "regexp", "array", "date",
@@ -1117,7 +1108,11 @@ declare namespace grunt {
              * Recurse through nested objects and arrays, executing callbackFunction for each non-object value.
              * If continueFunction returns false, a given object or value will be skipped.
              */
-            recurse(object: any, callbackFunction: (value: any) => void, continueFunction: (objOrValue: any) => boolean): void;
+            recurse(
+                object: any,
+                callbackFunction: (value: any) => void,
+                continueFunction: (objOrValue: any) => boolean,
+            ): void;
 
             /**
              * Return string str repeated n times.
@@ -1141,7 +1136,10 @@ declare namespace grunt {
              *        result - The result object is an
              *        code   - The numeric exit code.
              */
-            spawn(options: ISpawnOptions, done: (error: Error, result: ISpawnResult, code: number) => void): ISpawnedChild;
+            spawn(
+                options: ISpawnOptions,
+                done: (error: Error, result: ISpawnResult, code: number) => void,
+            ): ISpawnedChild;
 
             /**
              * Given an array or array-like object, return an array.
@@ -1156,54 +1154,54 @@ declare namespace grunt {
              * after all other predefined arguments. If the original function passed a value to a callback,
              * it will continue to do so.
              */
-            callbackify<R>(syncOrAsyncFunction: () => R):
-                (callback: (result: R) => void) => void;
-            callbackify<A, R>(syncOrAsyncFunction: (a: A) => R):
-                (a: A, callback: (result: R) => void) => void;
-            callbackify<A, B, R>(syncOrAsyncFunction: (a: A, b: B) => R):
-                (a: A, b: B, callback: (result: R) => void) => void;
-            callbackify<A, B, C, R>(syncOrAsyncFunction: (a: A, b: B, c: C) => R):
-                (a: A, b: B, c: C, callback: (result: R) => void) => void;
-            callbackify<A, B, C, D, R>(syncOrAsyncFunction: (a: A, b: B, c: C, d: D) => R):
-                (a: A, b: B, c: C, d: D, callback: (result: R) => void) => void;
+            callbackify<R>(syncOrAsyncFunction: () => R): (callback: (result: R) => void) => void;
+            callbackify<A, R>(syncOrAsyncFunction: (a: A) => R): (a: A, callback: (result: R) => void) => void;
+            callbackify<A, B, R>(
+                syncOrAsyncFunction: (a: A, b: B) => R,
+            ): (a: A, b: B, callback: (result: R) => void) => void;
+            callbackify<A, B, C, R>(
+                syncOrAsyncFunction: (a: A, b: B, c: C) => R,
+            ): (a: A, b: B, c: C, callback: (result: R) => void) => void;
+            callbackify<A, B, C, D, R>(
+                syncOrAsyncFunction: (a: A, b: B, c: C, d: D) => R,
+            ): (a: A, b: B, c: C, d: D, callback: (result: R) => void) => void;
 
             // Internal libraries
-            namespace: any
-            task: any
+            namespace: any;
+            task: any;
         }
 
         /**
          * {@link http://gruntjs.com/api/grunt.util#grunt.util.spawn}
          */
         interface ISpawnOptions {
-
             /**
              * The command to execute. It should be in the system path.
              */
-            cmd?: string;
+            cmd?: string | undefined;
 
             /**
              * If specified, the same grunt bin that is currently running will be
              * spawned as the child command, instead of the "cmd" option.
              * Defaults to false.
              */
-            grunt?: boolean;
+            grunt?: boolean | undefined;
 
             /**
              * An array of arguments to pass to the command.
              */
-            args?: string[];
+            args?: string[] | undefined;
 
             /**
              * Additional options for the Node.js child_process spawn method.
              */
             opts?: {
-                cwd?: string;
+                cwd?: string | undefined;
                 stdio?: any;
                 custom?: any;
                 env?: any;
-                detached?: boolean;
-            }
+                detached?: boolean | undefined;
+            } | undefined;
 
             /**
              * If this value is set and an error occurs, it will be used as the value
@@ -1298,7 +1296,6 @@ declare namespace grunt {
  * {@link http://gruntjs.com/api/grunt}
  */
 interface IGrunt extends grunt.IConfigComponents, grunt.fail.FailModule, grunt.ITaskComponents {
-
     config: grunt.config.ConfigModule;
 
     event: grunt.event.EventModule;
@@ -1325,11 +1322,11 @@ interface IGrunt extends grunt.IConfigComponents, grunt.fail.FailModule, grunt.I
     /**
      * The current Grunt version, as a string. This is just a shortcut to the grunt.package.version property.
      */
-    version: string
+    version: string;
 }
 
 // NodeJS Support
-declare module 'grunt' {
+declare module "grunt" {
     var grunt: IGrunt;
     export = grunt;
 }

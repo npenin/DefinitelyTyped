@@ -1,9 +1,6 @@
-// Type definitions for steam
-// Project: https://github.com/seishun/node-steam
-// Definitions by: Andrey Kurdyumov <https://github.com/kant2002>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-
 /// <reference types="node" />
+
+import { EventEmitter } from "events";
 
 export = Steam;
 
@@ -13,27 +10,27 @@ declare namespace Steam {
     export interface LogonOptions {
         accountName: string;
         password: string;
-        shaSentryfile?: string;
-        authCode?: string;
+        shaSentryfile?: string | undefined;
+        authCode?: string | undefined;
     }
 
     export enum EResult {
-        AccountLogonDenied
+        AccountLogonDenied,
     }
 
     export enum EPersonaState {
-        Online
+        Online,
     }
 
     export enum EChatEntryType {
-        ChatMsg
+        ChatMsg,
     }
 
     export enum EChatMemberStateChange {
-        Kicked
+        Kicked,
     }
 
-    export class SteamClient extends NodeJS.EventEmitter {
+    export class SteamClient extends EventEmitter {
         sessionId: string;
         cookie: string[];
         steamID: string;
@@ -61,4 +58,3 @@ declare namespace Steam {
         listenerCount(type: string): number;
     }
 }
-

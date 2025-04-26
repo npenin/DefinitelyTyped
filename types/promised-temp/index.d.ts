@@ -1,13 +1,7 @@
-// Type definitions for promised-temp 0.1
-// Project: https://www.npmjs.com/package/promised-temp, https://github.com/mikaturunen/promised-temp
-// Definitions by: Saqib Rokadia <https://github.com/rokadias>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-
 /// <reference types="node" />
 
-import * as fs from 'fs';
-import { AffixOptions, OpenFile, Stats } from "temp";
-export { AffixOptions, OpenFile, Stats } from "temp";
+import * as fs from "fs";
+import { AffixOptions, AffixOptions as _A, OpenFile, OpenFile as _O, Stats, Stats as _S } from "temp";
 
 interface TempStatic {
     dir: string;
@@ -19,6 +13,11 @@ interface TempStatic {
     cleanup(): Promise<boolean | Stats>;
     createWriteStream(affixes?: string | AffixOptions): Promise<fs.WriteStream>;
 }
+declare namespace PromisedTemp {
+    type AffixOptions = _A;
+    type OpenFile = _O;
+    type Stats = _S;
+}
 
 declare var PromisedTemp: TempStatic;
-export default PromisedTemp;
+export = PromisedTemp;

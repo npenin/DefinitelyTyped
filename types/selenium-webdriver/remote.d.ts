@@ -1,4 +1,4 @@
-import * as webdriver from './index';
+import * as webdriver from "./index";
 
 /**
  * A record object that defines the configuration options for a DriverService
@@ -6,7 +6,7 @@ import * as webdriver from './index';
  *
  * @record
  */
-export interface ServiceOptions { }
+export interface ServiceOptions {}
 
 /**
  * Manages the life and death of a native executable WebDriver server.
@@ -28,7 +28,7 @@ export class DriverService {
      *    the server's address.
      * @throws {Error} If the server has not been started.
      */
-    address(): webdriver.promise.Promise<string>;
+    address(): Promise<string>;
 
     /**
      * Returns whether the underlying process is still running. This does not take
@@ -46,7 +46,7 @@ export class DriverService {
      *     timeout expires before the server has started, the promise will be
      *     rejected.
      */
-    start(opt_timeoutMs?: number): webdriver.promise.Promise<string>;
+    start(opt_timeoutMs?: number): Promise<string>;
 
     /**
      * Stops the service if it is not currently running. This function will kill
@@ -55,15 +55,7 @@ export class DriverService {
      * @return {!promise.Promise} A promise that will be resolved when
      *     the server has been stopped.
      */
-    kill(): webdriver.promise.Promise<any>;
-
-    /**
-     * Schedules a task in the current control flow to stop the server if it is
-     * currently running.
-     * @return {!promise.Promise} A promise that will be resolved when
-     *     the server has been stopped.
-     */
-    stop(): webdriver.promise.Promise<any>;
+    kill(): Promise<any>;
 }
 
 export namespace DriverService {
@@ -84,7 +76,6 @@ export namespace DriverService {
          *
          * @param {...CommandLineFlag} var_args The arguments to include.
          * @return {!THIS} A self reference.
-         * @this {THIS}
          * @template THIS
          */
         addArguments(...var_args: string[]): this;
@@ -136,7 +127,7 @@ export namespace DriverService {
          *     current environment.
          * @return {!DriverService.Builder} A self reference.
          */
-        setEnvironment(env: Map<string, string> | {[name: string]: string} | null): this;
+        setEnvironment(env: Map<string, string> | { [name: string]: string } | null): this;
 
         /**
          * IO configuration for the spawned server process. For more information,
@@ -169,7 +160,7 @@ export class SeleniumServer extends DriverService {
      *     server.
      * @throws {Error} If the path to the Selenium jar is not specified or if an
      *     invalid port is specified.
-     **/
+     */
     constructor(jar: string, opt_options?: SeleniumServer.Options);
 }
 
@@ -179,27 +170,27 @@ export namespace SeleniumServer {
      */
     interface Options {
         /** Whether the server should only be accessed on this host's loopback address.*/
-        loopback?: boolean;
+        loopback?: boolean | undefined;
 
         /** The port to start the server on (must be > 0). If the port is provided
-        as a promise, the service will wait for the promise to resolve before starting. */
-        port?: number|webdriver.promise.IThenable<number>;
+    as a promise, the service will wait for the promise to resolve before starting. */
+        port?: number | Promise<number> | undefined;
 
         /** The arguments to pass to the service. If a promise is provided, the
-        service will wait for it to resolve before starting. */
-        args?: string[]|webdriver.promise.IThenable<string[]>;
+    service will wait for it to resolve before starting. */
+        args?: string[] | Promise<string[]> | undefined;
 
         /** The arguments to pass to the JVM. If a promise is provided, the service
-        will wait for it to resolve before starting. */
-        jvmArgs?: string[]|webdriver.promise.IThenable<string[]>;
+    will wait for it to resolve before starting. */
+        jvmArgs?: string[] | Promise<string[]> | undefined;
 
         /** The environment variables that should be visible to the server process.
-        Defaults to inheriting the current process's environment.*/
-        env?: {[key: string]: string};
+    Defaults to inheriting the current process's environment.*/
+        env?: { [key: string]: string } | undefined;
 
         /** IO configuration for the spawned server process. For more information,
-        refer to the documentation of `child_process.spawn`*/
-        stdio?: string|Array<string|number>;
+    refer to the documentation of `child_process.spawn`*/
+        stdio?: string | Array<string | number> | undefined;
     }
 }
 
@@ -220,23 +211,21 @@ export namespace SeleniumServer {
  * @final
  */
 export class FileDetector extends webdriver.FileDetector {
-    /**
-     * @constructor
-     **/
+    /** */
     constructor();
 
     /**
      * Prepares a `file` for use with the remote browser. If the provided path
      * does not reference a normal file (i.e. it does not exist or is a
-     * directory), then the promise returned by this method will be resolved with
-     * the original file path. Otherwise, this method will upload the file to the
-     * remote server, which will return the file's path on the remote system so
-     * it may be referenced in subsequent commands.
+     * directory), then the promise returned by this method will be resolved
+     * with the original file path. Otherwise, this method will upload the file
+     * to the remote server, which will return the file's path on the remote
+     * system so it may be referenced in subsequent commands.
      *
      * @param {!webdriver.WebDriver} driver The driver for the current browser.
      * @param {string} file The path of the file to process.
-     * @return {!webdriver.promise.Promise<string>} A promise for the processed
+     * @return {!Promise<string>} A promise for the processed
      *     file path.
      */
-    handleFile(driver: webdriver.WebDriver, file: string): webdriver.promise.Promise<string>;
+    handleFile(driver: webdriver.WebDriver, file: string): Promise<string>;
 }

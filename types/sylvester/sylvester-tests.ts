@@ -5,7 +5,7 @@ interface IAny {
 var obj: IAny;
 var n: number = 0;
 var bool: boolean = false;
-var str: string = '';
+var str: string = "";
 
 var l: Line = Line.create(v, v);
 var m: Matrix = Matrix.create(v);
@@ -212,6 +212,7 @@ v = v.reflectionIn(l);
 v = v.reflectionIn(p);
 v = v.rotate(n, v);
 v = v.rotate(n, l);
+v = v.rotate(m, l);
 v = v.round();
 v = v.setElements(v);
 v = v.setElements([n, n]);

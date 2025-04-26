@@ -7,8 +7,24 @@ checker.init(
         start: "/path/to/start/looking",
         production: true,
         customPath: {
-            licenseText: ""
-        }
+            licenseText: "",
+        },
+        json: false,
+        csv: false,
+        csvComponentPrefix: "prefixColumn",
+        out: "/write/to/specific/file",
+        failOn: "impermissible;licenses",
+        onlyAllow: "permissible;licenses",
+        packages: "packages;to;check",
+        excludePackages: "packages;to;exclude",
+        excludePrivatePackages: false,
+        direct: false,
+        color: true,
+        unknown: true,
+        customFormat: {
+            version: true,
+            name: true,
+        },
     },
     (err: Error, json: checker.ModuleInfos): void => {
         if (err) {
@@ -24,8 +40,8 @@ checker.init(
                     memo.push(license);
                     return memo;
                 },
-                [] as checker.ModuleInfo[]
+                [] as checker.ModuleInfo[],
             );
         }
-    }
+    },
 );

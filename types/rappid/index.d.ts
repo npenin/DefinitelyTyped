@@ -1,11 +1,5 @@
-// Type definitions for Rappid 1.5
-// Project: http://jointjs.com/about-rappid
-// Definitions by: Ewout Van Gossum <https://github.com/DenEwout>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-// TypeScript Version: 2.3
-
-import * as joint from 'jointjs';
 import * as Backbone from "backbone";
+import * as joint from "jointjs";
 
 export as namespace joint;
 
@@ -24,7 +18,7 @@ export namespace ui {
         constructor(opt: {
             paper: joint.dia.Paper;
             graph: joint.dia.Graph;
-            model: Backbone.Collection<joint.dia.Cell>
+            model: Backbone.Collection<joint.dia.Cell>;
         });
 
         createSelectionBox(cellView: joint.dia.CellView): void;

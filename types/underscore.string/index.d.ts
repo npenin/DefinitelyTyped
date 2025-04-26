@@ -1,14 +1,9 @@
-// Type definitions for underscore.string
-// Project: https://github.com/epeli/underscore.string
-// Definitions by: Ry Racherbaumer <https://github.com/rygine>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-
-import * as _ from 'underscore';
+import * as _ from "underscore";
 
 declare var self: _.UnderscoreStringStatic;
 export = self;
 
-declare module 'underscore' {
+declare module "underscore" {
     interface UnderscoreStatic extends UnderscoreStringStatic {
         str: UnderscoreStringStatic;
         string: UnderscoreStringStatic;
@@ -47,7 +42,6 @@ declare module 'underscore' {
      *   interface UnderscoreStatic extends UnderscoreStringStaticExports { }
      */
     export interface UnderscoreStringStaticExports {
-
         exports(): UnderscoreStringStaticExports;
 
         /**
@@ -580,7 +574,6 @@ declare module 'underscore' {
          * @param falseValues
          */
         toBoolean(str: string, trueValues?: any[], falseValues?: any[]): boolean;
-
     }
 }
 

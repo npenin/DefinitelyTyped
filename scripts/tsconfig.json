@@ -1,18 +1,11 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
-        "target": "es6",
-        "noImplicitAny": true,
-        "strictNullChecks": true,
-        "noImplicitReturns": true,
-        "noImplicitThis": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "baseUrl": "../types",
-        "typeRoots": [
-            "../types"
-        ],
-        "types": [],
-        "forceConsistentCasingInFileNames": true
-    }
+        "target": "es2023",
+        "module": "nodenext",
+        "strict": true,
+        "allowJs": true,
+        "checkJs": true,
+        "noEmit": true
+    },
+    "include": ["**/*.js"]
 }

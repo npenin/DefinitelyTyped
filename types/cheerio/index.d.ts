@@ -1,279 +1,318 @@
-// Type definitions for Cheerio v0.22.0
-// Project: https://github.com/cheeriojs/cheerio
-// Definitions by: Bret Little <https://github.com/blittle>, VILIC VANE <http://vilic.info>, Wayne Maurer <https://github.com/wmaurer>, Umar Nizamani <https://github.com/umarniz>, LiJinyao <https://github.com/LiJinyao>, Chennakrishna <https://github.com/chennakrishna8>, AzSiAz <https://github.com/AzSiAz>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
+/// <reference types="node" />
 
-interface Cheerio {
-    // Document References
-    // Cheerio https://github.com/cheeriojs/cheerio
-    // JQuery http://api.jquery.com
+interface Document {}
 
-    [index: number]: CheerioElement;
-    length: number;
+declare namespace cheerio {
+    type Element = TextElement | TagElement | CommentElement;
 
-    // Attributes
+    interface TextElement {
+        type: "text";
+        next: Element | null;
+        prev: Element | null;
+        parent: Element;
+        data?: string | undefined;
+        startIndex?: number | undefined;
+        endIndex?: number | undefined;
+    }
 
-    attr(): {[attr: string]: string};
-    attr(name: string): string;
-    attr(name: string, value: any): Cheerio;
+    interface TagElement {
+        tagName: string;
+        type: "tag" | "script" | "style";
+        name: string;
+        attribs: { [attr: string]: string };
+        "x-attribsNamespace": { [attr: string]: string };
+        "x-prefixNamespace": { [attr: string]: string };
+        children: Element[];
+        childNodes: Element[] | null;
+        lastChild: Element | null;
+        firstChild: Element | null;
+        next: Element | null;
+        nextSibling: Element;
+        prev: Element | null;
+        previousSibling: Element;
+        parent: Element;
+        parentNode: Element;
+        nodeValue: string;
+        data?: string | undefined;
+        startIndex?: number | undefined;
+        endIndex?: number | undefined;
+    }
 
-    data(): any;
-    data(name: string): any;
-    data(name: string, value: any): any;
+    interface CommentElement {
+        type: "comment";
+        next: Element | null;
+        prev: Element | null;
+        parent: Element;
+        data?: string | undefined;
+        startIndex?: number | undefined;
+        endIndex?: number | undefined;
+    }
 
-    val(): string;
-    val(value: string): Cheerio;
+    type AttrFunction = (el: Element, i: number, currentValue: string) => any;
 
-    removeAttr(name: string): Cheerio;
+    interface Cheerio {
+        // Document References
+        // Cheerio https://github.com/cheeriojs/cheerio
+        // JQuery http://api.jquery.com
 
-    has(selector: string): Cheerio;
-    has(element: CheerioElement): Cheerio;
+        [Symbol.iterator](): IterableIterator<Element>;
+        [index: number]: Element;
+        cheerio: string;
+        length: number;
 
-    hasClass(className: string): boolean;
-    addClass(classNames: string): Cheerio;
+        // Attributes
 
-    removeClass(): Cheerio;
-    removeClass(className: string): Cheerio;
-    removeClass(func: (index: number, className: string) => string): Cheerio;
+        attr(): { [attr: string]: string };
+        attr(name: string): string | undefined;
+        attr(name: string, value: AttrFunction): Cheerio;
+        // `value` *can* be `any` here but:
+        // 1. That makes type-checking the function-type useless
+        // 2. It's converted to a string anyways
+        attr(name: string, value: string): Cheerio;
+        // The map's values *can* be `any` but they'll all be cast to strings
+        // regardless.
+        attr(map: { [key: string]: any }): Cheerio;
 
-    toggleClass(className: string): Cheerio;
-    toggleClass(className: string, toggleSwitch: boolean): Cheerio;
-    toggleClass(toggleSwitch?: boolean): Cheerio;
-    toggleClass(func: (index: number, className: string, toggleSwitch: boolean) => string, toggleSwitch?: boolean): Cheerio;
+        data(): any;
+        data(name: string): any;
+        data(name: string, value: any): any;
 
-    is(selector: string): boolean;
-    is(element: CheerioElement): boolean;
-    is(element: CheerioElement[]): boolean;
-    is(selection: Cheerio): boolean;
-    is(func: (index: number, element: CheerioElement) => boolean): boolean;
+        val(): string;
+        val(value: string): Cheerio;
 
-    // Form
-    serialize(): string;
-    serializeArray(): {name: string, value: string}[];
+        removeAttr(name: string): Cheerio;
 
-    // Traversing
-    
-    find(selector: string): Cheerio;
-    find(element: Cheerio): Cheerio;
+        has(selector: string): Cheerio;
+        has(element: Element): Cheerio;
 
-    parent(selector?: string): Cheerio;
-    parents(selector?: string): Cheerio;
-    parentsUntil(selector?: string, filter?: string): Cheerio;
-    parentsUntil(element: CheerioElement, filter?: string): Cheerio;
-    parentsUntil(element: Cheerio, filter?: string): Cheerio;
+        hasClass(className: string): boolean;
+        addClass(classNames: string): Cheerio;
 
-    prop(name: string): any;
-    prop(name: string, value: any): Cheerio;
+        removeClass(): Cheerio;
+        removeClass(className: string): Cheerio;
+        removeClass(func: (index: number, className: string) => string): Cheerio;
 
-    closest(): Cheerio;
-    closest(selector: string): Cheerio;
+        toggleClass(className: string): Cheerio;
+        toggleClass(className: string, toggleSwitch: boolean): Cheerio;
+        toggleClass(toggleSwitch?: boolean): Cheerio;
+        toggleClass(
+            func: (index: number, className: string, toggleSwitch: boolean) => string,
+            toggleSwitch?: boolean,
+        ): Cheerio;
 
-    next(selector?: string): Cheerio;
-    nextAll(): Cheerio;
-    nextAll(selector: string): Cheerio;
+        is(selector: string): boolean;
+        is(element: Element): boolean;
+        is(element: Element[]): boolean;
+        is(selection: Cheerio): boolean;
+        is(func: (index: number, element: Element) => boolean): boolean;
 
-    nextUntil(selector?: string, filter?: string): Cheerio;
-    nextUntil(element: CheerioElement, filter?: string): Cheerio;
-    nextUntil(element: Cheerio, filter?: string): Cheerio;
+        // Form
+        serialize(): string;
+        serializeArray(): Array<{ name: string; value: string }>;
 
-    prev(selector?: string): Cheerio;
-    prevAll(): Cheerio;
-    prevAll(selector: string): Cheerio;
+        // Traversing
 
-    prevUntil(selector?: string, filter?: string): Cheerio;
-    prevUntil(element: CheerioElement, filter?: string): Cheerio;
-    prevUntil(element: Cheerio, filter?: string): Cheerio;
+        find(selector: string): Cheerio;
+        find(element: Cheerio): Cheerio;
 
-    slice(start: number, end?: number): Cheerio;
+        parent(selector?: string): Cheerio;
+        parents(selector?: string): Cheerio;
+        parentsUntil(selector?: string, filter?: string): Cheerio;
+        parentsUntil(element: Element, filter?: string): Cheerio;
+        parentsUntil(element: Cheerio, filter?: string): Cheerio;
 
-    siblings(selector?: string): Cheerio;
+        prop(name: string): any;
+        prop(name: string, value: any): Cheerio;
 
-    children(selector?: string): Cheerio;
+        closest(): Cheerio;
+        closest(selector: string): Cheerio;
 
-    contents(): Cheerio;
+        next(selector?: string): Cheerio;
+        nextAll(): Cheerio;
+        nextAll(selector: string): Cheerio;
 
-    each(func: (index: number, element: CheerioElement) => any): Cheerio;
-    map(func: (index: number, element: CheerioElement) => any): Cheerio;
+        nextUntil(selector?: string, filter?: string): Cheerio;
+        nextUntil(element: Element, filter?: string): Cheerio;
+        nextUntil(element: Cheerio, filter?: string): Cheerio;
 
-    filter(selector: string): Cheerio;
-    filter(selection: Cheerio): Cheerio;
-    filter(element: CheerioElement): Cheerio;
-    filter(elements: CheerioElement[]): Cheerio;
-    filter(func: (index: number, element: CheerioElement) => boolean): Cheerio;
+        prev(selector?: string): Cheerio;
+        prevAll(): Cheerio;
+        prevAll(selector: string): Cheerio;
 
-    not(selector: string): Cheerio;
-    not(selection: Cheerio): Cheerio;
-    not(element: CheerioElement): Cheerio;
-    not(func: (index: number, element: CheerioElement) => boolean): Cheerio;
+        prevUntil(selector?: string, filter?: string): Cheerio;
+        prevUntil(element: Element, filter?: string): Cheerio;
+        prevUntil(element: Cheerio, filter?: string): Cheerio;
 
-    first(): Cheerio;
-    last(): Cheerio;
+        slice(start: number, end?: number): Cheerio;
 
-    eq(index: number): Cheerio;
+        siblings(selector?: string): Cheerio;
 
-    get(): any[];
-    get(index: number): any;
+        children(selector?: string): Cheerio;
 
-    index(): number;
-    index(selector: string): number;
-    index(selection: Cheerio): number;
+        contents(): Cheerio;
 
-    end(): Cheerio;
+        each(func: (index: number, element: Element) => any): Cheerio;
+        map(func: (index: number, element: Element) => any): Cheerio;
 
-    add(selectorOrHtml: string): Cheerio;
-    add(selector: string, context: Document): Cheerio;
-    add(element: CheerioElement): Cheerio;
-    add(elements: CheerioElement[]): Cheerio;
-    add(selection: Cheerio): Cheerio;
+        filter(selector: string): Cheerio;
+        filter(selection: Cheerio): Cheerio;
+        filter(element: Element): Cheerio;
+        filter(elements: Element[]): Cheerio;
+        filter(func: (index: number, element: Element) => boolean): Cheerio;
 
-    addBack():Cheerio;
-    addBack(filter: string):Cheerio;
+        not(selector: string): Cheerio;
+        not(selection: Cheerio): Cheerio;
+        not(element: Element): Cheerio;
+        not(func: (index: number, element: Element) => boolean): Cheerio;
 
-    // Manipulation
-    appendTo(target: Cheerio) : Cheerio
-    prependTo(target: Cheerio) : Cheerio
+        first(): Cheerio;
+        last(): Cheerio;
 
-    append(content: string, ...contents: any[]): Cheerio;
-    append(content: Document, ...contents: any[]): Cheerio;
-    append(content: Document[], ...contents: any[]): Cheerio;
-    append(content: Cheerio, ...contents: any[]): Cheerio;
+        eq(index: number): Cheerio;
 
-    prepend(content: string, ...contents: any[]): Cheerio;
-    prepend(content: Document, ...contents: any[]): Cheerio;
-    prepend(content: Document[], ...contents: any[]): Cheerio;
-    prepend(content: Cheerio, ...contents: any[]): Cheerio;
+        get(): any[];
+        get(index: number): any;
 
-    after(content: string, ...contents: any[]): Cheerio;
-    after(content: Document, ...contents: any[]): Cheerio;
-    after(content: Document[], ...contents: any[]): Cheerio;
-    after(content: Cheerio, ...contents: any[]): Cheerio;
+        index(): number;
+        index(selector: string): number;
+        index(selection: Cheerio): number;
 
-    insertAfter(content: string): Cheerio;
-    insertAfter(content: Document): Cheerio;
-    insertAfter(content: Cheerio): Cheerio;
+        end(): Cheerio;
 
-    before(content: string, ...contents: any[]): Cheerio;
-    before(content: Document, ...contents: any[]): Cheerio;
-    before(content: Document[], ...contents: any[]): Cheerio;
-    before(content: Cheerio, ...contents: any[]): Cheerio;
+        add(selectorOrHtml: string): Cheerio;
+        add(selector: string, context: Document): Cheerio;
+        add(element: Element): Cheerio;
+        add(elements: Element[]): Cheerio;
+        add(selection: Cheerio): Cheerio;
 
-    insertBefore(content: string): Cheerio;
-    insertBefore(content: Document): Cheerio;
-    insertBefore(content: Cheerio): Cheerio;
+        addBack(): Cheerio;
+        addBack(filter: string): Cheerio;
 
-    remove(selector?: string): Cheerio;
+        // Manipulation
+        appendTo(target: Cheerio): Cheerio;
+        prependTo(target: Cheerio): Cheerio;
 
-    replaceWith(content: string): Cheerio;
-    replaceWith(content: CheerioElement): Cheerio;
-    replaceWith(content: CheerioElement[]): Cheerio;
-    replaceWith(content: Cheerio): Cheerio;
-    replaceWith(content: () => Cheerio): Cheerio;
+        append(content: string, ...contents: any[]): Cheerio;
+        append(content: Document, ...contents: any[]): Cheerio;
+        append(content: Document[], ...contents: any[]): Cheerio;
+        append(content: Cheerio, ...contents: any[]): Cheerio;
 
-    empty(): Cheerio;
+        prepend(content: string, ...contents: any[]): Cheerio;
+        prepend(content: Document, ...contents: any[]): Cheerio;
+        prepend(content: Document[], ...contents: any[]): Cheerio;
+        prepend(content: Cheerio, ...contents: any[]): Cheerio;
 
-    html(): string | null;
-    html(html: string): Cheerio;
+        after(content: string, ...contents: any[]): Cheerio;
+        after(content: Document, ...contents: any[]): Cheerio;
+        after(content: Document[], ...contents: any[]): Cheerio;
+        after(content: Cheerio, ...contents: any[]): Cheerio;
 
-    text(): string;
-    text(text: string): Cheerio;
+        insertAfter(content: string): Cheerio;
+        insertAfter(content: Document): Cheerio;
+        insertAfter(content: Cheerio): Cheerio;
 
-    wrap(content: string): Cheerio;
-    wrap(content: Document): Cheerio;
-    wrap(content: Cheerio): Cheerio;
+        before(content: string, ...contents: any[]): Cheerio;
+        before(content: Document, ...contents: any[]): Cheerio;
+        before(content: Document[], ...contents: any[]): Cheerio;
+        before(content: Cheerio, ...contents: any[]): Cheerio;
 
-    css(propertyName: string): string;
-    css(propertyNames: string[]): string[];
-    css(propertyName: string, value: string): Cheerio;
-    css(propertyName: string, value: number): Cheerio;
-    css(propertyName: string, func: (index: number, value: string) => string): Cheerio;
-    css(propertyName: string, func: (index: number, value: string) => number): Cheerio;
-    css(properties: Object): Cheerio;
+        insertBefore(content: string): Cheerio;
+        insertBefore(content: Document): Cheerio;
+        insertBefore(content: Cheerio): Cheerio;
 
-    // Rendering
+        remove(selector?: string): Cheerio;
 
-    // Miscellaneous
+        replaceWith(content: string): Cheerio;
+        replaceWith(content: Element): Cheerio;
+        replaceWith(content: Element[]): Cheerio;
+        replaceWith(content: Cheerio): Cheerio;
+        replaceWith(content: () => Cheerio): Cheerio;
 
-    clone(): Cheerio;
+        empty(): Cheerio;
 
-    // Not Documented
+        html(): string | null;
+        html(html: string): Cheerio;
 
-    toArray(): CheerioElement[];
+        text(): string;
+        text(text: string): Cheerio;
+
+        wrap(content: string): Cheerio;
+        wrap(content: Document): Cheerio;
+        wrap(content: Cheerio): Cheerio;
+
+        css(propertyName?: string): string;
+        css(propertyNames: string[]): string[];
+        css(propertyName: string, value: string): Cheerio;
+        css(propertyName: string, value: number): Cheerio;
+        css(propertyName: string, func: (index: number, value: string) => string): Cheerio;
+        css(propertyName: string, func: (index: number, value: string) => number): Cheerio;
+        css(properties: Object): Cheerio;
+
+        // Rendering
+
+        // Miscellaneous
+
+        clone(): Cheerio;
+
+        // Not Documented
+
+        toArray(): Element[];
+    }
+
+    interface CheerioParserOptions {
+        // Document References
+        // Cheerio https://github.com/cheeriojs/cheerio
+        // HTMLParser2 https://github.com/fb55/htmlparser2/wiki/Parser-options
+        // DomHandler https://github.com/fb55/DomHandler
+
+        xmlMode?: boolean | undefined;
+        decodeEntities?: boolean | undefined;
+        lowerCaseTags?: boolean | undefined;
+        lowerCaseAttributeNames?: boolean | undefined;
+        recognizeCDATA?: boolean | undefined;
+        recognizeSelfClosing?: boolean | undefined;
+        normalizeWhitespace?: boolean | undefined;
+        withStartIndices?: boolean | undefined;
+        withEndIndices?: boolean | undefined;
+        ignoreWhitespace?: boolean | undefined;
+        _useHtmlParser2?: boolean | undefined;
+    }
+
+    interface Selector {
+        (selector: string): Cheerio;
+        (selector: string, context: string): Cheerio;
+        (selector: string, context: Element): Cheerio;
+        (selector: string, context: Element[]): Cheerio;
+        (selector: string, context: Cheerio): Cheerio;
+        (selector: string, context: string, root: string): Cheerio;
+        (selector: string, context: Element, root: string): Cheerio;
+        (selector: string, context: Element[], root: string): Cheerio;
+        (selector: string, context: Cheerio, root: string): Cheerio;
+        (selector: any): Cheerio;
+    }
+
+    interface Root extends Selector {
+        // Document References
+        // Cheerio https://github.com/cheeriojs/cheerio
+        // JQuery http://api.jquery.com
+        root(): Cheerio;
+        contains(container: Element, contained: Element): boolean;
+        parseHTML(data: string, context?: Document | null, keepScripts?: boolean): Document[];
+
+        html(options?: CheerioParserOptions): string;
+        html(dom: string | Cheerio | Element, options?: CheerioParserOptions): string;
+
+        xml(dom?: string | Cheerio | Element): string;
+    }
+
+    interface CheerioAPI extends Root {
+        version: string;
+        load(html: string | Buffer, options?: CheerioParserOptions): Root;
+        load(element: Element | Element[], options?: CheerioParserOptions): Root;
+    }
 }
-
-interface CheerioOptionsInterface {
-    // Document References
-    // Cheerio https://github.com/cheeriojs/cheerio
-    // HTMLParser2 https://github.com/fb55/htmlparser2/wiki/Parser-options
-    // DomHandler https://github.com/fb55/DomHandler
-
-    xmlMode?: boolean;
-    decodeEntities?: boolean;
-    lowerCaseTags?: boolean;
-    lowerCaseAttributeNames?: boolean;
-    recognizeCDATA?: boolean;
-    recognizeSelfClosing?: boolean;
-    normalizeWhitespace?: boolean;
-    ignoreWhitespace?: boolean;
-}
-
-interface CheerioSelector {
-    (selector: string): Cheerio;
-    (selector: string, context: string): Cheerio;
-    (selector: string, context: CheerioElement): Cheerio;
-    (selector: string, context: CheerioElement[]): Cheerio;
-    (selector: string, context: Cheerio): Cheerio;
-    (selector: string, context: string, root: string): Cheerio;
-    (selector: string, context: CheerioElement, root: string): Cheerio;
-    (selector: string, context: CheerioElement[], root: string): Cheerio;
-    (selector: string, context: Cheerio, root: string): Cheerio;
-    (selector: any): Cheerio;
-}
-
-interface CheerioStatic extends CheerioSelector {
-    // Document References
-    // Cheerio https://github.com/cheeriojs/cheerio
-    // JQuery http://api.jquery.com
-    xml(): string;
-    root(): Cheerio;
-    contains(container: CheerioElement, contained: CheerioElement): boolean;
-    parseHTML(data: string, context?: Document, keepScripts?: boolean): Document[];
-
-    html(options?: CheerioOptionsInterface): string;
-    html(selector: string, options?: CheerioOptionsInterface): string;
-    html(element: Cheerio, options?: CheerioOptionsInterface): string;
-    html(element: CheerioElement, options?: CheerioOptionsInterface): string;
-}
-
-interface CheerioElement {
-    // Document References
-    // Node Console
-    tagName: string;
-    type: string;
-    name: string;
-    attribs: {[attr: string]: string};
-    children: CheerioElement[];
-    childNodes: CheerioElement[];
-    lastChild: CheerioElement;
-    firstChild: CheerioElement;
-    next: CheerioElement;
-    nextSibling: CheerioElement;
-    prev: CheerioElement;
-    previousSibling: CheerioElement;
-    parent: CheerioElement;
-    parentNode: CheerioElement;
-    nodeValue: string;
-    data?: string;
-}
-
-interface CheerioAPI extends CheerioSelector, CheerioStatic {
-  load(html: string, options?: CheerioOptionsInterface): CheerioStatic;
-  load(element: CheerioElement, options?: CheerioOptionsInterface): CheerioStatic;
-}
-
-interface Document { }
-
-declare var cheerio:CheerioAPI;
 
 declare module "cheerio" {
-    export = cheerio;
+    const cheerioModule: cheerio.CheerioAPI;
+    export = cheerioModule;
 }

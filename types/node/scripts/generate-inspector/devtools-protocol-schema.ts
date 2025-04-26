@@ -7,7 +7,7 @@ export interface Documentable {
     experimental?: boolean;
 }
 
-export interface BaseType<T= string> {
+export interface BaseType<T = string> {
     type: T;
 }
 
@@ -29,48 +29,50 @@ export interface ObjectReference {
     $ref: string;
 }
 
-export type TypeDefinition = BaseType<"any"|"integer"|"number"|"boolean"> |
-    StringType | ArrayType | ObjectDefinition;
+export type TypeDefinition =
+    | BaseType<"any" | "integer" | "number" | "boolean">
+    | StringType
+    | ArrayType
+    | ObjectDefinition;
 
 export type Type = TypeDefinition & Documentable & {
-    id: string,
+    id: string;
 };
 
 export type Field = TypeDefinition | ObjectReference;
 
 export type Parameter = Field & Documentable & {
-    name: string,
-    optional?: boolean,
+    name: string;
+    optional?: boolean;
 };
 
 export interface Command extends Documentable {
     name: string;
-    description?: string;
     handlers?: string[];
     parameters?: Parameter[];
     returns?: Parameter[];
-    experimental?: boolean;
     redirect?: string;
 }
 
 export interface Event extends Documentable {
     name: string;
     parameters?: Parameter[];
-    description?: string;
 }
 
 // It should be safe to load a devtools-protocol/json file and cast it to
 // this type.
 export interface Schema {
     version: {
-        major: string,
-        minor: string,
+        major: string;
+        minor: string;
     };
-    domains: Array<{
-        domain: string,
-        types?: Type[],
-        commands: Command[],
-        events?: Event[],
-        dependencies?: string[],
-    } & Documentable>;
+    domains: Array<
+        {
+            domain: string;
+            types?: Type[];
+            commands?: Command[];
+            events?: Event[];
+            dependencies?: string[];
+        } & Documentable
+    >;
 }

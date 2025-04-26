@@ -1,15 +1,20 @@
-// Type definitions for lolex 3
-// Project: https://github.com/sinonjs/lolex
-// Definitions by: Wim Looman <https://github.com/Nemo157>
-//                 Josh Goldberg <https://github.com/joshuakgoldberg>
-//                 Rogier Schouten <https://github.com/rogierschouten>
-//                 Yishai Zehavi <https://github.com/zyishai>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-
 /**
  * Names of clock methods that may be faked by install.
  */
-type FakeMethod = "setTimeout" | "clearTimeout" | "setImmediate" | "clearImmediate" | "setInterval" | "clearInterval" | "Date" | "nextTick" | "hrtime";
+type FakeMethod =
+    | "setTimeout"
+    | "clearTimeout"
+    | "setImmediate"
+    | "clearImmediate"
+    | "setInterval"
+    | "clearInterval"
+    | "Date"
+    | "nextTick"
+    | "hrtime"
+    | "requestAnimationFrame"
+    | "cancelAnimationFrame"
+    | "requestIdleCallback"
+    | "cancelIdleCallback";
 
 /**
  * Global methods avaliable to every clock and also as standalone methods (inside `timers` global object).
@@ -126,12 +131,28 @@ export interface LolexClock<TTimerId extends TimerId> extends GlobalTimers<TTime
      */
     cancelAnimationFrame: (id: TTimerId) => void;
 
-	/**
-	 * Get the number of waiting timers.
-	 *
-	 * @returns number of waiting timers.
-	 */
-	countTimers: () => number;
+    /**
+     * Queues the callback to be fired during idle periods to perform background and low priority work on the main event loop.
+     *
+     * @param callback   Callback to be fired.
+     * @param timeout   The maximum number of ticks before the callback must be fired.
+     * @remarks Callbacks which have a timeout option will be fired no later than time in milliseconds.
+     */
+    requestIdleCallback: (callback: () => void, timeout?: number) => TTimerId;
+
+    /**
+     * Clears a timer, as long as it was created using requestIdleCallback.
+     *
+     * @param id   Timer ID or object.
+     */
+    cancelIdleCallback: (id: TTimerId) => void;
+
+    /**
+     * Get the number of waiting timers.
+     *
+     * @returns number of waiting timers.
+     */
+    countTimers: () => number;
 
     /**
      * Advances the clock to the the moment of the first scheduled timer, firing it.
@@ -139,11 +160,27 @@ export interface LolexClock<TTimerId extends TimerId> extends GlobalTimers<TTime
     next: () => void;
 
     /**
+     * Advances the clock to the the moment of the first scheduled timer, firing it.
+     *
+     * Also breaks the event loop, allowing any scheduled promise callbacks to execute _before_ running the timers.
+     */
+    nextAsync: () => Promise<void>;
+
+    /**
      * Advance the clock, firing callbacks if necessary.
      *
      * @param time   How many ticks to advance by.
      */
     tick: (time: number | string) => void;
+
+    /**
+     * Advance the clock, firing callbacks if necessary.
+     *
+     * Also breaks the event loop, allowing any scheduled promise callbacks to execute _before_ running the timers.
+     *
+     * @param time   How many ticks to advance by.
+     */
+    tickAsync: (time: number | string) => Promise<void>;
 
     /**
      * Removes all timers and tick without firing them and restore now to its original value.
@@ -157,16 +194,33 @@ export interface LolexClock<TTimerId extends TimerId> extends GlobalTimers<TTime
      */
     runAll: () => void;
 
-	/**
-	 * Advanced the clock to the next animation frame while firing all scheduled callbacks.
-	 */
-	runToFrame: () => void;
+    /**
+     * Runs all pending timers until there are none remaining.
+     *
+     * Also breaks the event loop, allowing any scheduled promise callbacks to execute _before_ running the timers.
+     *
+     * @remarks  If new timers are added while it is executing they will be run as well.
+     */
+    runAllAsync: () => Promise<void>;
+
+    /**
+     * Advanced the clock to the next animation frame while firing all scheduled callbacks.
+     */
+    runToFrame: () => void;
 
     /**
      * Takes note of the last scheduled timer when it is run, and advances the clock to
      * that time firing callbacks as necessary.
      */
     runToLast: () => void;
+
+    /**
+     * Takes note of the last scheduled timer when it is run, and advances the clock to
+     * that time firing callbacks as necessary.
+     *
+     * Also breaks the event loop, allowing any scheduled promise callbacks to execute _before_ running the timers.
+     */
+    runToLastAsync: () => Promise<void>;
 
     /**
      * Simulates a user changing the system clock.
@@ -186,7 +240,7 @@ type BrowserClock = LolexClock<number> & {
      */
     performance: {
         now: () => number;
-    }
+    };
 };
 
 /**
@@ -212,8 +266,8 @@ type NodeClock = LolexClock<NodeTimer> & {
     nextTick: (callback: () => void) => void;
 
     /**
-	 * Run all pending microtasks scheduled with nextTick.
-	 */
+     * Run all pending microtasks scheduled with nextTick.
+     */
     runMicrotasks: () => void;
 };
 
@@ -238,9 +292,9 @@ type InstalledMethods = {
 /**
  * Clock object created by calling `install();`.
  *
- * @type TClock   type of base clock (e.g BrowserClock).
+ * @typeparam {TClock}   type of base clock (e.g BrowserClock).
  */
-type InstalledClock<TClock extends Clock> = TClock & InstalledMethods;
+type InstalledClock<TClock extends Clock = Clock> = TClock & InstalledMethods;
 
 /**
  * Creates a clock.
@@ -249,10 +303,10 @@ type InstalledClock<TClock extends Clock> = TClock & InstalledMethods;
  * @param loopLimit    Maximum number of timers that will be run when calling runAll()
  *                     before assuming that we have an infinite loop and throwing an error
  *                     (by default, 1000).
- * @type TClock   Type of clock to create.
+ * @typeparam {TClock}   Type of clock to create.
  * @remarks The default epoch is 0.
  */
-export declare function createClock<TClock extends Clock>(now?: number | Date, loopLimit?: number): TClock;
+export declare function createClock<TClock extends Clock = Clock>(now?: number | Date, loopLimit?: number): TClock;
 
 export interface LolexInstallOpts {
     /**
@@ -263,30 +317,30 @@ export interface LolexInstallOpts {
     /**
      * Installs lolex with the specified unix epoch (default: 0)
      */
-    now?: number | Date;
+    now?: number | Date | undefined;
 
     /**
      * An array with explicit function names to hijack. When not set, lolex will automatically fake all methods except nextTick
      * e.g., lolex.install({ toFake: ["setTimeout", "nextTick"]}) will fake only setTimeout and nextTick
      */
-    toFake?: FakeMethod[];
+    toFake?: FakeMethod[] | undefined;
 
     /**
      * The maximum number of timers that will be run when calling runAll() (default: 1000)
      */
-    loopLimit?: number;
+    loopLimit?: number | undefined;
 
     /**
      * Tells lolex to increment mocked time automatically based on the real system time shift (e.g. the mocked time will be incremented by
      * 20ms for every 20ms change in the real system time) (default: false)
      */
-    shouldAdvanceTime?: boolean;
+    shouldAdvanceTime?: boolean | undefined;
 
     /**
      * Relevant only when using with shouldAdvanceTime: true. increment mocked time by advanceTimeDelta ms every advanceTimeDelta ms change
      * in the real system time (default: 20)
      */
-    advanceTimeDelta?: number;
+    advanceTimeDelta?: number | undefined;
 }
 
 /**
@@ -294,14 +348,14 @@ export interface LolexInstallOpts {
  *
  * @param now   Current time for the clock, as with lolex.createClock().
  * @param toFake   Names of methods that should be faked.
- * @type TClock   Type of clock to create.
+ * @typeparam {TClock}   Type of clock to create.
  */
-export declare function install<TClock extends Clock>(opts?: LolexInstallOpts): InstalledClock<TClock>;
+export declare function install<TClock extends Clock = Clock>(opts?: LolexInstallOpts): InstalledClock<TClock>;
 
 export interface LolexWithContext {
     timers: GlobalTimers<TimerId>;
-    createClock: <TClock extends Clock>(now?: number | Date, loopLimit?: number) => TClock;
-    install: <TClock extends Clock>(opts?: LolexInstallOpts) => InstalledClock<TClock>;
+    createClock: <TClock extends Clock = Clock>(now?: number | Date, loopLimit?: number) => TClock;
+    install: <TClock extends Clock = Clock>(opts?: LolexInstallOpts) => InstalledClock<TClock>;
     withGlobal: (global: Object) => LolexWithContext;
 }
 

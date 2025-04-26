@@ -1,4 +1,10 @@
-import * as webdriver from './index';
+import * as webdriver from "./index";
+import * as remote from "./remote";
+
+/**
+ * IEDriverServer logging levels.
+ */
+export type Level = "FATAL" | "ERROR" | "WARN" | "INFO" | "DEBUG" | "TRACE";
 
 /**
  * A WebDriver client for Microsoft's Internet Explorer.
@@ -7,13 +13,15 @@ export class Driver extends webdriver.WebDriver {
     /**
      * Creates a new session for Microsoft's Internet Explorer.
      *
-     * @param {(capabilities.Capabilities|Options)=} opt_config The configuration
-     *     options.
-     * @param {promise.ControlFlow=} opt_flow The control flow to use,
-     *     or {@code null} to use the currently active flow.
+     * @param {(Capabilities|Options)=} options The configuration options.
+     * @param {(remote.DriverService)=} opt_service The `DriverService` to use
+     *   to start the IEDriverServer in a child process, optionally.
      * @return {!Driver} A new driver instance.
      */
-    static createSession(opt_config?: webdriver.Capabilities | Options, opt_flow?: webdriver.promise.ControlFlow): Driver;
+    static createSession(
+        options?: webdriver.Capabilities | Options,
+        opt_service?: remote.DriverService,
+    ): Driver;
 
     /**
      * This function is a no-op as file detectors are not supported by this
@@ -26,22 +34,18 @@ export class Driver extends webdriver.WebDriver {
 /**
  * Class for managing IEDriver specific options.
  */
-export class Options {
-    constructor();
-
+export class Options extends webdriver.Capabilities {
     /**
-     * Extracts the IEDriver specific options from the given capabilities
-     * object.
-     * @param {!capabilities.Capabilities} caps The capabilities object.
-     * @return {!Options} The IEDriver options.
+     * @param {(Capabilities|Map<string, ?>|Object)=} other Another set of
+     *     capabilities to initialize this instance from.
      */
-    static fromCapabilities(caps: webdriver.Capabilities): Options;
+    constructor(other?: webdriver.Capabilities | Map<string, any> | object);
 
     /**
      * Whether to disable the protected mode settings check when the session is
      * created. Disbling this setting may lead to significant instability as the
-     * browser may become unresponsive/hang. Only 'best effort' support is provided
-     * when using this capability.
+     * browser may become unresponsive/hang. Only 'best effort' support is
+     * provided when using this capability.
      *
      * For more information, refer to the IEDriver's
      * [required system configuration](http://goo.gl/eH0Yi3).
@@ -55,13 +59,15 @@ export class Options {
      * Indicates whether to skip the check that the browser's zoom level is set to
      * 100%.
      *
-     * @param {boolean} ignore Whether to ignore the browser's zoom level settings.
+     * @param {boolean} ignore Whether to ignore the browser's zoom level
+     *     settings.
      * @return {!Options} A self reference.
      */
     ignoreZoomSetting(ignore: boolean): Options;
 
     /**
-     * Sets the initial URL loaded when IE starts. This is intended to be used with
+     * Sets the initial URL loaded when IE starts. This is intended to be used
+     * with
      * {@link #ignoreProtectedModeSettings} to allow the user to initialize IE in
      * the proper Protected Mode zone. Setting this option may cause browser
      * instability or flaky and unresponsive code. Only 'best effort' support is
@@ -129,10 +135,11 @@ export class Options {
      * Specifies command-line switches to use when launching Internet Explorer.
      * This is only valid when used with {@link #forceCreateProcessApi}.
      *
-     * @param {...(string|!Array.<string>)} var_args The arguments to add.
+     * @param {...(string|!Array.<string>)} args The arguments to add.
+     * @deprecated Use {@link #addBrowserCommandSwitches} instead.
      * @return {!Options} A self reference.
      */
-    addArguments(...var_args: string[]): Options;
+    addArguments(...args: string[]): Options;
 
     /**
      * Configures whether proxies should be configured on a per-process basis. If
@@ -145,10 +152,10 @@ export class Options {
     usePerProcessProxy(enable: boolean): Options;
 
     /**
-     * Configures whether to clear the cache, cookies, history, and saved form data
-     * before starting the browser. _Using this capability will clear session data
-     * for all running instances of Internet Explorer, including those started
-     * manually._
+     * Configures whether to clear the cache, cookies, history, and saved form
+     * data before starting the browser. _Using this capability will clear session
+     * data for all running instances of Internet Explorer, including those
+     * started manually._
      *
      * @param {boolean} cleanSession Whether to clear all session data on startup.
      * @return {!Options} A self reference.
@@ -167,7 +174,7 @@ export class Options {
      * @param {Level} level The logging level.
      * @return {!Options} A self reference.
      */
-    setLogLevel(level: webdriver.logging.Level): Options;
+    setLogLevel(level: Level): Options;
 
     /**
      * Sets the IP address of the driver's host adapter.
@@ -191,18 +198,45 @@ export class Options {
     silent(silent: boolean): Options;
 
     /**
-     * Sets the proxy settings for the new session.
-     * @param {capabilities.ProxyConfig} proxy The proxy configuration to use.
+     * The options File Upload Dialog Timeout in milliseconds
+     *
+     * @param {number} timeout How long to wait for IE.
      * @return {!Options} A self reference.
      */
-    setProxy(proxy: webdriver.ProxyConfig): Options;
+    fileUploadDialogTimeout(timeout: number): Options;
 
     /**
-     * Converts this options instance to a {@link capabilities.Capabilities}
-     * object.
-     * @param {capabilities.Capabilities=} opt_capabilities The capabilities to
-     *     merge these options into, if any.
-     * @return {!capabilities.Capabilities} The capabilities.
+     * Sets the IEDriver to drive Chromium-based Edge in Internet Explorer mode.
+     * @param {boolean} attachEdgeChromium Whether to run in Chromium-based-Edge in IE mode
+     * @return {!Options} A self reference.
      */
-    toCapabilities(opt_capabilities?: webdriver.Capabilities): webdriver.Capabilities;
+    setEdgeChromium(attachEdgeChromium: boolean): Options;
+
+    /**
+     * Sets the path of the EdgeChromium driver.
+     * @param {string} path The EdgeChromium driver path
+     * @return {!Options} A self reference.
+     */
+    setEdgePath(path: string): Options;
+
+    /**
+     * Sets how elements should be scrolled into view for interaction.
+     * @param {number} behavior The desired scroll behavior: either 0 to align with
+     *     the top of the viewport or 1 to align with the bottom.
+     * @return {!Options} A self reference.
+     */
+    setScrollBehavior(behavior: number): Options;
+}
+
+/**
+ * Creates {@link selenium-webdriver/remote.DriverService} instances that manage
+ * an [IEDriverServer](https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver)
+ * server in a child process.
+ */
+export class ServiceBuilder extends remote.DriverService.Builder {
+    /**
+     * @param {string=} opt_exe Path to the server executable to use. If omitted,
+     *     the builder will attempt to locate the IEDriverServer on the system PATH.
+     */
+    constructor(opt_exe?: string);
 }

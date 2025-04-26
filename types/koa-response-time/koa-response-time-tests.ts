@@ -1,4 +1,5 @@
-import koaResponseTime = require('koa-response-time');
-import Koa = require('koa');
+import koaResponseTime = require("koa-response-time");
 
-new Koa().use(koaResponseTime());
+koaResponseTime();
+koaResponseTime({});
+koaResponseTime({ hrtime: true });

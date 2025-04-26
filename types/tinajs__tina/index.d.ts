@@ -1,9 +1,3 @@
-// Type definitions for @tinajs/tina 1.4
-// Project: https://github.com/tinajs/tina, https://tina.js.org
-// Definitions by: Jiayu Liu <https://github.com/Jimexist>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped/tinajs__tina
-// TypeScript Version: 2.2
-
 export function use(plugin: any): void;
 
 export interface ComponentProperties {
@@ -22,7 +16,7 @@ export interface ComponentDefinitions extends ComponentLifecycles {
     properties: ComponentProperties;
     data: { [key: string]: any };
     compute: (data: { [key: string]: any }) => { [key: string]: any };
-    methods: { [name: string]: (this: Component) => any };
+    methods: { [name: string]: (this: Component, ...args: any[]) => any };
     mixins: Array<Partial<ComponentDefinitions>>;
 }
 
@@ -35,7 +29,7 @@ export class Component {
 
 export interface PageHooks {
     beforeLoad: (this: Page) => void;
-    onLoad: (this: Page) => void;
+    onLoad: (this: Page, options?: any) => void;
     onReady: (this: Page) => void;
     onShow: (this: Page) => void;
     onHide: (this: Page) => void;
@@ -49,10 +43,7 @@ export interface PageEvents {
     onPageScroll: (event: Page) => void;
 }
 
-export interface PageDefinitions
-    extends ComponentDefinitions,
-        PageEvents,
-        PageHooks {
+export interface PageDefinitions extends ComponentDefinitions, PageEvents, PageHooks {
     mixins: Array<Partial<PageDefinitions>>;
 }
 

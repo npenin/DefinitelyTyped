@@ -1,22 +1,21 @@
-// Type definitions for empty-dir 1.0
-// Project: https://github.com/gulpjs/empty-dir
-// Definitions by: BendingBender <https://github.com/BendingBender>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-
 /// <reference types="node" />
 
 export = emptyDir;
 
 declare function emptyDir(
-    dir: string,
-    cb: (err: NodeJS.ErrnoException, isEmpty: boolean) => void
+    dir: string | readonly string[],
+    cb: (err: NodeJS.ErrnoException, isEmpty: boolean) => void,
 ): void;
 declare function emptyDir(
-    dir: string,
+    dir: string | readonly string[],
     filter: (path: string) => boolean,
-    cb: (err: NodeJS.ErrnoException, isEmpty: boolean) => void
+    cb: (err: NodeJS.ErrnoException, isEmpty: boolean) => void,
 ): void;
+declare function emptyDir(
+    dir: string | readonly string[],
+    filter?: (path: string) => boolean,
+): Promise<boolean>;
 
 declare namespace emptyDir {
-    function sync(dir: string, filter?: (path: string) => boolean): boolean;
+    function sync(dir: string | readonly string[], filter?: (path: string) => boolean): boolean;
 }
